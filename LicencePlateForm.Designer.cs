@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            Button btnTag;
             title = new Label();
             lblDay = new Label();
             subtitle = new Label();
@@ -82,9 +83,9 @@
             lblDay.AutoSize = true;
             lblDay.Location = new Point(370, 36);
             lblDay.Name = "lblDay";
-            lblDay.Size = new Size(44, 15);
+            lblDay.Size = new Size(35, 15);
             lblDay.TabIndex = 1;
-            lblDay.Text = "day {n}";
+            lblDay.Text = "day 1";
             // 
             // subtitle
             // 
@@ -126,7 +127,7 @@
             // 
             // pictureBox1
             // 
-            pictureBox1.Image = LicencePlateManagement.Properties.Resources.Logo;
+            pictureBox1.Image = Properties.Resources.Logo;
             pictureBox1.Location = new Point(226, 9);
             pictureBox1.Margin = new Padding(3, 2, 3, 2);
             pictureBox1.Name = "pictureBox1";
@@ -141,7 +142,6 @@
             lstUntagged.Location = new Point(28, 99);
             lstUntagged.Margin = new Padding(3, 2, 3, 2);
             lstUntagged.Name = "lstUntagged";
-            lstUntagged.SelectionMode = SelectionMode.MultiExtended;
             lstUntagged.Size = new Size(132, 169);
             lstUntagged.TabIndex = 7;
             lstUntagged.SelectedIndexChanged += SelectedIndexChanged;
@@ -152,7 +152,6 @@
             lstTagged.Location = new Point(406, 99);
             lstTagged.Margin = new Padding(3, 2, 3, 2);
             lstTagged.Name = "lstTagged";
-            lstTagged.SelectionMode = SelectionMode.MultiExtended;
             lstTagged.Size = new Size(132, 169);
             lstTagged.TabIndex = 8;
             lstTagged.SelectedIndexChanged += SelectedIndexChanged;
@@ -202,6 +201,7 @@
             btnDelete.TabIndex = 12;
             btnDelete.Text = "Delete";
             btnDelete.UseVisualStyleBackColor = true;
+            btnDelete.Click += BtnDelete_Click;
             // 
             // btnSearch
             // 
@@ -247,6 +247,7 @@
             btnSave.TabIndex = 17;
             btnSave.Text = "Save";
             btnSave.UseVisualStyleBackColor = true;
+            btnSave.Click += BtnSave_Click;
             // 
             // btnLoad
             // 
@@ -257,6 +258,7 @@
             btnLoad.TabIndex = 18;
             btnLoad.Text = "Load";
             btnLoad.UseVisualStyleBackColor = true;
+            btnLoad.Click += BtnOpen_Click;
             // 
             // rdoBinary
             // 

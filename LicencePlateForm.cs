@@ -7,13 +7,22 @@ namespace LicencePlateManagement
         private readonly List<string> untaggedList = [];
         private readonly List<string> taggedList = [];
 
+
+
+        (ListBox lstBox, List<string> lst, Box syn) selectedList;
+
         public LicencePlateForm()
         {
             InitializeComponent();
-            lstUntagged.MouseDoubleClick += FocusText;
+            lstUntagged.MouseDoubleClick += BtnDelete_Click;
             lstTagged.MouseDoubleClick += Untag;
             rdoBinary.Checked = true;
             txtInput.KeyPress += TxtInput_EnterPressed;
+            selectedList = (
+                lstUntagged,
+                untaggedList,
+                Box.UNTAGGED
+            );
         }
 
         private void TxtInput_EnterPressed(object? sender, KeyPressEventArgs e)
@@ -28,17 +37,17 @@ namespace LicencePlateManagement
 
         private void Untag(object? sender, MouseEventArgs e)
         {
-            string[] selItems = [.. lstTagged.SelectedItems.Cast<string>()];
-            var selIndices = lstTagged.SelectedIndices.Cast<int>().Reverse();
+            var selItem = (string?)lstTagged.SelectedItem;
+            int selIndx = lstTagged.SelectedIndex;
 
-            foreach (int selIndx in selIndices)
+            if (selItem != null)
             {
                 taggedList.RemoveAt(selIndx);
+                Algorithms.AddSorted(untaggedList, selItem);
+                SyncLists(Box.BOTH);
             }
-
-
-            Algorithms.Merge(untaggedList, selItems);
-            SyncLists(Box.BOTH);
+            else
+                statusMsg.Text = "Nothing Selected";
         }
 
         [GeneratedRegex(@"^1[A-Z]{3}-\d{3}$")]
@@ -46,7 +55,7 @@ namespace LicencePlateManagement
 
         private void Add(object? sender, EventArgs e)
         {
-            string newPlate = txtInput.Text.ToUpper();
+            string newPlate = Input.ToUpper();
             txtInput.Clear();
             if (untaggedList.Contains(newPlate) || taggedList.Contains(newPlate))
             {
@@ -67,27 +76,26 @@ namespace LicencePlateManagement
 
         private void BtnEdit_Click(object sender, EventArgs e)
         {
-            string newPlate = txtInput.Text.ToUpper();
-            string? oldPlate = (string?)lstUntagged.SelectedItem;
+            string newPlate = Input.ToUpper();
+            string? oldPlate = (string?)selectedList.lstBox.SelectedItem;
+
+
             if (oldPlate == null)
                 statusMsg.Text = "No plate selected to edit";
-
             else if (untaggedList.Contains(newPlate) || taggedList.Contains(newPlate))
-            {
                 statusMsg.Text = "Plate already in list";
-            }
             else if (!ValidPlate().IsMatch(newPlate))
                 statusMsg.Text = "Invalid Plate";
             else
             {
-                untaggedList[lstUntagged.SelectedIndex] = newPlate;
-                SyncLists(Box.UNTAGGED);
+                selectedList.lst[selectedList.lstBox.SelectedIndex] = newPlate;
+                SyncLists(selectedList.syn);
                 statusMsg.Text = $"Added Plate {newPlate}";
 
             }
         }
 
-        private void SyncLists(Box category)
+        private void SyncLists(Box? category)
         {
             if (category is Box.TAGGED or Box.BOTH)
             {
@@ -111,50 +119,145 @@ namespace LicencePlateManagement
 
         private void BtnTag_Click(object? sender, EventArgs e)
         {
-            string[] selItems = [.. lstUntagged.SelectedItems.Cast<string>()];
-            var selIndices = lstUntagged.SelectedIndices.Cast<int>().Reverse();
+            var selItem = (string?)lstUntagged.SelectedItem;
+            int selIndx = lstUntagged.SelectedIndex;
 
-            foreach (int selIndx in selIndices)
+            if (selItem != null)
             {
                 untaggedList.RemoveAt(selIndx);
+                Algorithms.AddSorted(taggedList, selItem);
+                SyncLists(Box.BOTH);
             }
-
-
-            Algorithms.Merge(taggedList, selItems);
-            SyncLists(Box.BOTH);
+            else
+                statusMsg.Text = "Nothing Selected";
 
 
         }
-
+        String Input
+        {
+            get => txtInput.Text.ToUpper();
+            set => txtInput.Text = value.ToUpper();
+        }
         private void BtnSearch_Click(object sender, EventArgs e)
         {
-            Func<List<string>, string, int> Search = rdoBinary.Checked ?
-                Algorithms.BinarySearch
-                : Algorithms.SequentialSearch;
+            Func<List<string>, string, int> Search;
+            statusMsg.Text = $"Searching for {Input} with ";
+
             if (rdoBinary.Checked)
             {
-                int result;
-                if ((result = Search(untaggedList, txtInput.Text)) != -1)
-                    lstUntagged.SelectedIndex = result;
-                else if ((result = Search(taggedList, txtInput.Text)) != -1)
-                    lstTagged.SelectedIndex = result;
-                else
-                    statusMsg.Text = "Plate not found";
-
+                statusMsg.Text += "Binary Search: ";
+                Search = Algorithms.BinarySearch;
             }
+            else
+            {
+                statusMsg.Text += "Linear Search: ";
+                Search = Algorithms.SequentialSearch;
+            }
+            int result;
+            if ((result = Search(untaggedList, Input)) != -1)
+            {
+                statusMsg.Text += $"Found in untagged plates at index {result}";
+                lstUntagged.SelectedIndex = result;
+            }
+            else if ((result = Search(taggedList, Input)) != -1)
+            {
+                statusMsg.Text += $"Found in tagged plates at index {result}";
+                lstTagged.SelectedIndex = result;
+            }
+            else
+                statusMsg.Text += "Plate not found";
+
+
         }
 
         private void SelectedIndexChanged(object sender, EventArgs e)
         {
-            string? selected = (string?)((ListBox)sender).SelectedItem;
-            if (selected != null && selected != txtInput.Text)
+            var selBox = (ListBox)sender;
+            List<string> lst;
+            Box syncList;
+            if (selBox.Name.Contains("Untagged"))
             {
-                txtInput.Text = selected;
+
+                lst = untaggedList;
+                syncList = Box.UNTAGGED;
+            }
+            else
+            {
+
+                lst = taggedList;
+                syncList = Box.TAGGED;
+            }
+            selectedList = (selBox, lst, syncList);
+
+            string? selected = (string?)selectedList.lstBox.SelectedItem;
+
+            if (selected != null && selected != Input)
+            {
+                Input = selected;
             }
         }
 
+        private void BtnDelete_Click(object? sender, EventArgs e)
+        {
+            int selndx = selectedList.lstBox.SelectedIndex;
+            if (selndx != -1)
+            {
+                selectedList.lst.RemoveAt(selndx);
+                SyncLists(Box.BOTH);
+            }
+        }
+
+        private string FileName
+            => $"day_{_fileNo:d2}.txt";
+        private int FileNo
+        {
+            get => _fileNo;
+            set
+            {
+                _fileNo = value;
+                lblDay.Text = $"day {_fileNo}";
+            }
+        }
+        private int _fileNo = 1;
+        private void BtnSave_Click(object sender, EventArgs e)
+        {
+            var files = Directory.GetFiles(Directory.GetCurrentDirectory()).Select(Path.GetFileName);
+
+            while (files.Contains(FileName))
+                FileNo++;
+
+
+            using StreamWriter sw = new(FileName);
+
+            foreach (string plate in taggedList)
+            {
+                sw.WriteLine(plate + ",*");
+            }
+            foreach (string plate in untaggedList)
+            {
+                sw.WriteLine(plate + ",");
+            }
+        }
+
+        private void BtnOpen_Click(object sender, EventArgs e)
+        {
+            if (!File.Exists(FileName)) return;
+            taggedList.Clear();
+            untaggedList.Clear();
+            using (StreamReader sr = new(FileName))
+            {
+                for (string[]? line = sr.ReadLine()?.Split(","); line != null; line = sr.ReadLine()?.Split(","))
+                {
+                    if (line.Length >= 2 && line[1] == "*")
+                        taggedList.Add(line[0]);
+                    else
+                        untaggedList.Add(line[0]);
+
+                }
+            }
+            SyncLists(Box.BOTH);
+        }
+
         private enum Box { TAGGED, UNTAGGED, BOTH }
-
-
     }
 }
