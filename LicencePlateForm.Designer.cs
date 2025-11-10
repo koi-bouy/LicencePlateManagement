@@ -41,30 +41,21 @@
             statusMsg = new ToolStripStatusLabel();
             txtInput = new TextBox();
             btnAdd = new Button();
-            btnDelete = new Button();
-            btnSearch = new Button();
+            btnExit = new Button();
+            btnBinSearch = new Button();
             btnEdit = new Button();
             btnReset = new Button();
             btnSave = new Button();
             btnOpen = new Button();
-            rdoBinary = new RadioButton();
-            rdoLinear = new RadioButton();
-            grpSearchAlgorithm = new GroupBox();
+            grpSearch = new GroupBox();
+            btnSeqSearch = new Button();
             btnTag = new Button();
+            openFileDialog1 = new OpenFileDialog();
+            saveFileDialog1 = new SaveFileDialog();
             ((System.ComponentModel.ISupportInitialize)logo).BeginInit();
             statusStrip1.SuspendLayout();
-            grpSearchAlgorithm.SuspendLayout();
+            grpSearch.SuspendLayout();
             SuspendLayout();
-            // 
-            // btnTag
-            // 
-            btnTag.Location = new Point(32, 362);
-            btnTag.Name = "btnTag";
-            btnTag.Size = new Size(94, 32);
-            btnTag.TabIndex = 15;
-            btnTag.Text = "Tag";
-            btnTag.UseVisualStyleBackColor = true;
-            btnTag.Click += BtnTag_Click;
             // 
             // title
             // 
@@ -79,7 +70,7 @@
             // lblDay
             // 
             lblDay.AutoSize = true;
-            lblDay.Location = new Point(423, 48);
+            lblDay.Location = new Point(380, 48);
             lblDay.Name = "lblDay";
             lblDay.Size = new Size(45, 20);
             lblDay.TabIndex = 1;
@@ -116,7 +107,7 @@
             // lblTagged
             // 
             lblTagged.AutoSize = true;
-            lblTagged.Location = new Point(464, 105);
+            lblTagged.Location = new Point(423, 106);
             lblTagged.Margin = new Padding(0, 3, 0, 3);
             lblTagged.Name = "lblTagged";
             lblTagged.Size = new Size(128, 20);
@@ -145,7 +136,7 @@
             // lstTagged
             // 
             lstTagged.FormattingEnabled = true;
-            lstTagged.Location = new Point(464, 132);
+            lstTagged.Location = new Point(424, 132);
             lstTagged.Name = "lstTagged";
             lstTagged.Size = new Size(150, 224);
             lstTagged.TabIndex = 8;
@@ -157,7 +148,7 @@
             statusStrip1.Items.AddRange(new ToolStripItem[] { statusMsg });
             statusStrip1.Location = new Point(0, 425);
             statusStrip1.Name = "statusStrip1";
-            statusStrip1.Size = new Size(629, 26);
+            statusStrip1.Size = new Size(581, 26);
             statusStrip1.TabIndex = 9;
             statusStrip1.Text = "statusStrip1";
             // 
@@ -171,7 +162,7 @@
             // 
             txtInput.Location = new Point(189, 155);
             txtInput.Name = "txtInput";
-            txtInput.Size = new Size(270, 27);
+            txtInput.Size = new Size(229, 27);
             txtInput.TabIndex = 10;
             // 
             // btnAdd
@@ -184,25 +175,25 @@
             btnAdd.UseVisualStyleBackColor = true;
             btnAdd.Click += Add;
             // 
-            // btnDelete
+            // btnExit
             // 
-            btnDelete.Location = new Point(189, 292);
-            btnDelete.Name = "btnDelete";
-            btnDelete.Size = new Size(94, 29);
-            btnDelete.TabIndex = 12;
-            btnDelete.Text = "Delete";
-            btnDelete.UseVisualStyleBackColor = true;
-            btnDelete.Click += BtnDelete_Click;
+            btnExit.Location = new Point(189, 292);
+            btnExit.Name = "btnExit";
+            btnExit.Size = new Size(94, 29);
+            btnExit.TabIndex = 12;
+            btnExit.Text = "Exit";
+            btnExit.UseVisualStyleBackColor = true;
+            btnExit.Click += BtnExit_Click;
             // 
             // btnSearch
             // 
-            btnSearch.Location = new Point(365, 189);
-            btnSearch.Name = "btnSearch";
-            btnSearch.Size = new Size(94, 29);
-            btnSearch.TabIndex = 13;
-            btnSearch.Text = "Search";
-            btnSearch.UseVisualStyleBackColor = true;
-            btnSearch.Click += BtnBinSearch_Click;
+            btnBinSearch.Location = new Point(6, 26);
+            btnBinSearch.Name = "btnSearch";
+            btnBinSearch.Size = new Size(94, 29);
+            btnBinSearch.TabIndex = 13;
+            btnBinSearch.Text = "Binary";
+            btnBinSearch.UseVisualStyleBackColor = true;
+            btnBinSearch.Click += BtnBinSearch_Click;
             // 
             // btnEdit
             // 
@@ -218,7 +209,7 @@
             // 
             btnReset.BackColor = Color.Red;
             btnReset.ForeColor = SystemColors.Window;
-            btnReset.Location = new Point(523, 389);
+            btnReset.Location = new Point(480, 393);
             btnReset.Name = "btnReset";
             btnReset.Size = new Size(94, 29);
             btnReset.TabIndex = 16;
@@ -228,7 +219,7 @@
             // 
             // btnSave
             // 
-            btnSave.Location = new Point(423, 12);
+            btnSave.Location = new Point(380, 12);
             btnSave.Name = "btnSave";
             btnSave.Size = new Size(94, 29);
             btnSave.TabIndex = 17;
@@ -238,7 +229,7 @@
             // 
             // btnOpen
             // 
-            btnOpen.Location = new Point(523, 12);
+            btnOpen.Location = new Point(480, 12);
             btnOpen.Name = "btnOpen";
             btnOpen.Size = new Size(94, 29);
             btnOpen.TabIndex = 18;
@@ -246,52 +237,65 @@
             btnOpen.UseVisualStyleBackColor = true;
             btnOpen.Click += BtnOpen_Click;
             // 
-            // rdoBinary
+            // grpSearch
             // 
-            rdoBinary.AutoSize = true;
-            rdoBinary.Checked = true;
-            rdoBinary.Location = new Point(6, 27);
-            rdoBinary.Name = "rdoBinary";
-            rdoBinary.Size = new Size(71, 24);
-            rdoBinary.TabIndex = 19;
-            rdoBinary.TabStop = true;
-            rdoBinary.Text = "Binary";
-            rdoBinary.UseVisualStyleBackColor = true;
+            grpSearch.Controls.Add(btnSeqSearch);
+            grpSearch.Controls.Add(btnBinSearch);
+            grpSearch.Location = new Point(311, 225);
+            grpSearch.Name = "grpSearch";
+            grpSearch.Size = new Size(107, 96);
+            grpSearch.TabIndex = 21;
+            grpSearch.TabStop = false;
+            grpSearch.Text = "Search";
             // 
-            // rdoLinear
+            // button1
             // 
-            rdoLinear.AutoSize = true;
-            rdoLinear.Location = new Point(6, 56);
-            rdoLinear.Name = "rdoLinear";
-            rdoLinear.Size = new Size(70, 24);
-            rdoLinear.TabIndex = 20;
-            rdoLinear.Text = "Linear";
-            rdoLinear.UseVisualStyleBackColor = true;
+            btnSeqSearch.Location = new Point(6, 61);
+            btnSeqSearch.Name = "button1";
+            btnSeqSearch.Size = new Size(94, 29);
+            btnSeqSearch.TabIndex = 22;
+            btnSeqSearch.Text = "Linear";
+            btnSeqSearch.UseVisualStyleBackColor = true;
+            btnSeqSearch.Click += BtnSeqSearch_Click;
+
+            openFileDialog1.DefaultExt = "txt";
+            saveFileDialog1.DefaultExt = "txt";
+
+
+            openFileDialog1.Filter = "Text Files (*.txt)| *.txt";
+            saveFileDialog1.Filter = "Text Files (*.txt)| *.txt";
             // 
-            // grpSearchAlgorithm
+            // btnTag
             // 
-            grpSearchAlgorithm.Controls.Add(rdoBinary);
-            grpSearchAlgorithm.Controls.Add(rdoLinear);
-            grpSearchAlgorithm.Location = new Point(288, 224);
-            grpSearchAlgorithm.Name = "grpSearchAlgorithm";
-            grpSearchAlgorithm.Size = new Size(170, 96);
-            grpSearchAlgorithm.TabIndex = 21;
-            grpSearchAlgorithm.TabStop = false;
-            grpSearchAlgorithm.Text = "Search Algorithm";
+            btnTag.Location = new Point(32, 362);
+            btnTag.Name = "btnTag";
+            btnTag.Size = new Size(94, 32);
+            btnTag.TabIndex = 15;
+            btnTag.Text = "Tag";
+            btnTag.UseVisualStyleBackColor = true;
+            btnTag.Click += BtnTag_Click;
+            // 
+            // openFileDialog1
+            // 
+            openFileDialog1.FileName = "openFileDialog1";
+            openFileDialog1.FileOk += openFileDialog1_FileOk;
+            // 
+            // saveFileDialog1
+            // 
+            saveFileDialog1.FileOk += saveFileDialog1_FileOk;
             // 
             // LicencePlateForm
             // 
             AutoScaleDimensions = new SizeF(8F, 20F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(629, 451);
-            Controls.Add(grpSearchAlgorithm);
+            ClientSize = new Size(581, 451);
+            Controls.Add(grpSearch);
             Controls.Add(btnOpen);
-            Controls.Add(btnDelete);
+            Controls.Add(btnExit);
             Controls.Add(btnSave);
             Controls.Add(btnReset);
             Controls.Add(btnTag);
             Controls.Add(btnEdit);
-            Controls.Add(btnSearch);
             Controls.Add(btnAdd);
             Controls.Add(txtInput);
             Controls.Add(statusStrip1);
@@ -309,8 +313,7 @@
             ((System.ComponentModel.ISupportInitialize)logo).EndInit();
             statusStrip1.ResumeLayout(false);
             statusStrip1.PerformLayout();
-            grpSearchAlgorithm.ResumeLayout(false);
-            grpSearchAlgorithm.PerformLayout();
+            grpSearch.ResumeLayout(false);
             ResumeLayout(false);
             PerformLayout();
         }
@@ -330,15 +333,16 @@
         private ToolStripStatusLabel statusMsg;
         private TextBox txtInput;
         private Button btnAdd;
-        private Button btnDelete;
-        private Button btnSearch;
+        private Button btnExit;
+        private Button btnBinSearch;
         private Button btnEdit;
         private Button btnTag;
         private Button btnReset;
         private Button btnSave;
         private Button btnOpen;
-        private RadioButton rdoBinary;
-        private RadioButton rdoLinear;
-        private GroupBox grpSearchAlgorithm;
+        private GroupBox grpSearch;
+        private Button btnSeqSearch;
+        private OpenFileDialog openFileDialog1;
+        private SaveFileDialog saveFileDialog1;
     }
 }

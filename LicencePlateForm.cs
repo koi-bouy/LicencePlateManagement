@@ -14,7 +14,11 @@ namespace LicencePlateManagement
         public LicencePlateForm()
         {
             InitializeComponent();
-            lstUntagged.MouseDoubleClick += BtnDelete_Click;
+
+            openFileDialog1.InitialDirectory =
+            saveFileDialog1.InitialDirectory = Environment.CurrentDirectory;
+
+            lstUntagged.MouseDoubleClick += Delete_DoubleClick;
             lstTagged.MouseDoubleClick += Untag;
             txtInput.KeyPress += TxtInput_EnterPressed;
             selectedList = (
@@ -81,7 +85,6 @@ namespace LicencePlateManagement
             string newPlate = Input.ToUpper();
             string? oldPlate = (string?)selectedList.lstBox.SelectedItem;
 
-
             if (oldPlate == null)
                 statusMsg.Text = "No plate selected to edit";
             else if (untaggedList.Contains(newPlate) || taggedList.Contains(newPlate))
@@ -93,28 +96,24 @@ namespace LicencePlateManagement
                 selectedList.lst[selectedList.lstBox.SelectedIndex] = newPlate;
                 statusMsg.Text = $"Edited Plate {oldPlate} to be {newPlate}";
                 SyncLists(selectedList.syn);
+                selectedList.lstBox.SelectedItem = newPlate;
 
             }
         }
 
-        private void SyncLists(Box? category)
+        private void SyncLists(Box category)
         {
 
             if (category is Box.TAGGED or Box.BOTH)
             {
-                var selIndx = lstTagged.SelectedIndex;
                 lstTagged.Items.Clear();
                 lstTagged.Items.AddRange([.. taggedList]);
-                lstTagged.SelectedIndex = selIndx;
-
             }
 
             if (category is Box.UNTAGGED or Box.BOTH)
             {
-                var selIndx = lstUntagged.SelectedIndex;
                 lstUntagged.Items.Clear();
                 lstUntagged.Items.AddRange([.. untaggedList]);
-                lstUntagged.SelectedItem = selIndx;
             }
         }
 
@@ -156,38 +155,6 @@ namespace LicencePlateManagement
             set => txtInput.Text = value.ToUpper();
         }
 
-        private void BtnSearch_Click(object sender, EventArgs e)
-        {
-            Func<List<string>, string, int> Search;
-            statusMsg.Text = $"Searching for {Input} with ";
-
-            if (rdoBinary.Checked)
-            {
-                statusMsg.Text += "Binary Search: ";
-                Search = Algorithms.BinarySearch;
-            }
-            else
-            {
-                statusMsg.Text += "Linear Search: ";
-                Search = Algorithms.SequentialSearch;
-            }
-
-            int result;
-            if ((result = Search(untaggedList, Input)) != -1)
-            {
-                statusMsg.Text += $"Found in untagged plates at index {result}";
-                lstUntagged.SelectedIndex = result;
-            }
-            else if ((result = Search(taggedList, Input)) != -1)
-            {
-                statusMsg.Text += $"Found in tagged plates at index {result}";
-                lstTagged.SelectedIndex = result;
-            }
-            else
-                statusMsg.Text += "Plate not found";
-
-
-        }
 
         private void BtnBinSearch_Click(object sender, EventArgs e)
         {
@@ -241,7 +208,18 @@ namespace LicencePlateManagement
         /// <summary>
         /// Deletes the selected item
         /// </summary>
-        private void BtnDelete_Click(object? sender, EventArgs e)
+        private void BtnExit_Click(object? sender, EventArgs e)
+        {
+            DeleteSelected();
+            txtInput.Focus();
+        }
+
+        private void Delete_DoubleClick(object? sender, MouseEventArgs e)
+        {
+            DeleteSelected();
+        }
+
+        private void DeleteSelected()
         {
             int selndx = selectedList.lstBox.SelectedIndex;
             if (selndx != -1)
@@ -266,16 +244,51 @@ namespace LicencePlateManagement
 
         private int _fileNo = 1;
 
-        private void BtnSave_Click(object sender, EventArgs e)
+        private void CalculateFileNumber()
         {
             var files = Directory.GetFiles(Directory.GetCurrentDirectory()).Select(Path.GetFileName);
 
             while (files.Contains(FileName))
                 FileNo++;
+        }
+
+        private void BtnSave_Click(object sender, EventArgs e)
+        {
+
+            CalculateFileNumber();
+            saveFileDialog1.FileName = FileName;
+            saveFileDialog1.ShowDialog();
+
+        }
+
+        private void BtnOpen_Click(object sender, EventArgs e)
+        {
+            CalculateFileNumber();
+            openFileDialog1.FileName = FileName;
+            openFileDialog1.ShowDialog();
+            SyncLists(Box.BOTH);
+        }
 
 
-            using StreamWriter wr = new(FileName);
+        private void openFileDialog1_FileOk(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            taggedList.Clear();
+            untaggedList.Clear();
+            using var op = new StreamReader(openFileDialog1.FileName);
+            for (string? line = op.ReadLine(); line != null; line = op.ReadLine())
+            {
+                string[] plate = line.Split(",");
+                if (ValidPlate().IsMatch(plate[0]))
+                    (plate.Length >= 2 && plate[1] == "*"
+                        ? taggedList
+                        : untaggedList).Add(plate[0]);
+            }
+        }
 
+        private void saveFileDialog1_FileOk(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+
+            using StreamWriter wr = new(saveFileDialog1.FileName);
             foreach (string plate in taggedList)
             {
                 wr.WriteLine(plate + ",*");
@@ -286,28 +299,6 @@ namespace LicencePlateManagement
             }
         }
 
-        private void BtnOpen_Click(object sender, EventArgs e)
-        {
-            if (!File.Exists(FileName))
-            {
-                statusMsg.Text = "No files ";
-                return;
-            }
-
-            taggedList.Clear();
-            untaggedList.Clear();
-            using (var op = new StreamReader(FileName))
-                for (string? line = op.ReadLine(); line != null; line = op.ReadLine())
-                {
-                    string[] plate = line.Split(",");
-                    if (ValidPlate().IsMatch(plate[0]))
-                        (plate.Length >= 2 && plate[1] == "*"
-                            ? taggedList
-                            : untaggedList).Add(plate[0]);
-                }
-
-            SyncLists(Box.BOTH);
-        }
         #endregion
 
         private enum Box { TAGGED, UNTAGGED, BOTH }

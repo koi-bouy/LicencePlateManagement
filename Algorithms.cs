@@ -1,9 +1,8 @@
-﻿// Raphael Fernandes, 30099423, Sprint 2
-// Date: 20/10/2025
-// Version: 2.1
-// Name: Astronomical Processing
-// Class containing Sorting/Searching algorithms.
-// Can handle both ascending and descending sorts.
+﻿// Raphael Fernandes, 30099423
+// Date: 10/11/2025
+// Version: 1.0
+// Name: Active Systems Pty. Library Management System
+// Class containing Sorting algorithms.
 namespace LicencePlateManagement
 {
     /// <summary>
@@ -11,33 +10,6 @@ namespace LicencePlateManagement
     /// </summary>
     public static class Algorithms
     {
-        /// <summary>
-        /// Uses Binary Search to find a string in a list and return its index
-        /// </summary>
-        /// <param name="list">string list to search</param>
-        /// <param name="search">string to search for</param>
-        /// <returns>index of search item, or -1 if the item cannot be found</returns>
-        public static int BinarySearch(List<string> list, string search)
-        {
-            int start = 0;
-            int end = list.Count - 1;
-            int middle;
-            while (start <= end)
-            {
-                middle = (start + end) / 2;
-
-                int comparison = string.Compare(search, list[middle]);
-
-                if (comparison == 0)
-                    return middle;
-                else if (comparison < 0)
-                    end = middle - 1;
-                else
-                    start = middle + 1;
-            }
-            return -1;
-        }
-
         /// <summary>
         /// Loops through a list, from beginning to end,
         /// And checks each item if it's search item
@@ -68,11 +40,12 @@ namespace LicencePlateManagement
             List<string> merged = [];
             int lstPtr = 0, addPtr = 0;
             while (lstPtr < list.Count && addPtr < additions.Length)
+            {
                 merged.Add((list[lstPtr].CompareTo(additions[addPtr]) < 0)
                     ? list[lstPtr++]
                     : additions[addPtr++]
-                    );
-
+                );
+            }
             merged.AddRange(list[lstPtr..]);
             merged.AddRange(additions[addPtr..]);
 
