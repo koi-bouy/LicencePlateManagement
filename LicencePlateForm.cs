@@ -16,7 +16,6 @@ namespace LicencePlateManagement
             InitializeComponent();
             lstUntagged.MouseDoubleClick += BtnDelete_Click;
             lstTagged.MouseDoubleClick += Untag;
-            rdoBinary.Checked = true;
             txtInput.KeyPress += TxtInput_EnterPressed;
             selectedList = (
                 lstUntagged,
@@ -45,6 +44,8 @@ namespace LicencePlateManagement
                 taggedList.RemoveAt(selIndx);
                 Algorithms.AddSorted(untaggedList, selItem);
                 SyncLists(Box.BOTH);
+                lstUntagged.SelectedItem = selItem;
+
             }
             else
                 statusMsg.Text = "Nothing Selected";
@@ -65,6 +66,7 @@ namespace LicencePlateManagement
             {
                 Algorithms.AddSorted(untaggedList, newPlate);
                 SyncLists(Box.UNTAGGED);
+                lstUntagged.SelectedItem = newPlate;
                 statusMsg.Text = $"Added Plate {newPlate}";
 
             }
@@ -89,34 +91,47 @@ namespace LicencePlateManagement
             else
             {
                 selectedList.lst[selectedList.lstBox.SelectedIndex] = newPlate;
+                statusMsg.Text = $"Edited Plate {oldPlate} to be {newPlate}";
                 SyncLists(selectedList.syn);
-                statusMsg.Text = $"Added Plate {newPlate}";
 
             }
         }
 
         private void SyncLists(Box? category)
         {
+
             if (category is Box.TAGGED or Box.BOTH)
             {
+                var selIndx = lstTagged.SelectedIndex;
                 lstTagged.Items.Clear();
                 lstTagged.Items.AddRange([.. taggedList]);
+                lstTagged.SelectedIndex = selIndx;
+
             }
 
             if (category is Box.UNTAGGED or Box.BOTH)
             {
+                var selIndx = lstUntagged.SelectedIndex;
                 lstUntagged.Items.Clear();
                 lstUntagged.Items.AddRange([.. untaggedList]);
+                lstUntagged.SelectedItem = selIndx;
             }
         }
 
+        /// <summary>
+        /// Resets plate data from both lists and the input text box
+        /// </summary>
         private void BtnReset_Click(object sender, EventArgs e)
         {
             untaggedList.Clear();
             taggedList.Clear();
+            txtInput.Clear();
             SyncLists(Box.BOTH);
         }
 
+        /// <summary>
+        /// Shifts selected item from untagged to tagged list
+        /// </summary>
         private void BtnTag_Click(object? sender, EventArgs e)
         {
             var selItem = (string?)lstUntagged.SelectedItem;
@@ -127,17 +142,20 @@ namespace LicencePlateManagement
                 untaggedList.RemoveAt(selIndx);
                 Algorithms.AddSorted(taggedList, selItem);
                 SyncLists(Box.BOTH);
+                lstTagged.SelectedItem = selItem;
             }
             else
                 statusMsg.Text = "Nothing Selected";
 
 
         }
+
         String Input
         {
             get => txtInput.Text.ToUpper();
             set => txtInput.Text = value.ToUpper();
         }
+
         private void BtnSearch_Click(object sender, EventArgs e)
         {
             Func<List<string>, string, int> Search;
@@ -153,6 +171,7 @@ namespace LicencePlateManagement
                 statusMsg.Text += "Linear Search: ";
                 Search = Algorithms.SequentialSearch;
             }
+
             int result;
             if ((result = Search(untaggedList, Input)) != -1)
             {
@@ -170,6 +189,29 @@ namespace LicencePlateManagement
 
         }
 
+        private void BtnBinSearch_Click(object sender, EventArgs e)
+        {
+            statusMsg.Text = $"Searching for {Input} with Binary Search: ";
+            int result;
+            if ((result = selectedList.lst.BinarySearch(Input)) != -1)
+            {
+                statusMsg.Text += $"Found in untagged plates at index {result}";
+            }
+            else
+                statusMsg.Text += "Plate not found";
+        }
+
+        private void BtnSeqSearch_Click(object sender, EventArgs e)
+        {
+            statusMsg.Text = $"Searching for {Input} with Sequential Search: ";
+            int result;
+            if ((result = Algorithms.SequentialSearch(selectedList.lst, Input)) != -1)
+            {
+                statusMsg.Text += $"Found in untagged plates at index {result}";
+            }
+            statusMsg.Text += "Plate not found";
+        }
+
         private void SelectedIndexChanged(object sender, EventArgs e)
         {
             var selBox = (ListBox)sender;
@@ -177,7 +219,6 @@ namespace LicencePlateManagement
             Box syncList;
             if (selBox.Name.Contains("Untagged"))
             {
-
                 lst = untaggedList;
                 syncList = Box.UNTAGGED;
             }
@@ -191,24 +232,28 @@ namespace LicencePlateManagement
 
             string? selected = (string?)selectedList.lstBox.SelectedItem;
 
-            if (selected != null && selected != Input)
+            if (selected != null)
             {
                 Input = selected;
             }
         }
 
+        /// <summary>
+        /// Deletes the selected item
+        /// </summary>
         private void BtnDelete_Click(object? sender, EventArgs e)
         {
             int selndx = selectedList.lstBox.SelectedIndex;
             if (selndx != -1)
             {
                 selectedList.lst.RemoveAt(selndx);
-                SyncLists(Box.BOTH);
+                SyncLists(selectedList.syn);
             }
         }
-
+        #region File Management
         private string FileName
             => $"day_{_fileNo:d2}.txt";
+
         private int FileNo
         {
             get => _fileNo;
@@ -218,7 +263,9 @@ namespace LicencePlateManagement
                 lblDay.Text = $"day {_fileNo}";
             }
         }
+
         private int _fileNo = 1;
+
         private void BtnSave_Click(object sender, EventArgs e)
         {
             var files = Directory.GetFiles(Directory.GetCurrentDirectory()).Select(Path.GetFileName);
@@ -227,36 +274,41 @@ namespace LicencePlateManagement
                 FileNo++;
 
 
-            using StreamWriter sw = new(FileName);
+            using StreamWriter wr = new(FileName);
 
             foreach (string plate in taggedList)
             {
-                sw.WriteLine(plate + ",*");
+                wr.WriteLine(plate + ",*");
             }
             foreach (string plate in untaggedList)
             {
-                sw.WriteLine(plate + ",");
+                wr.WriteLine(plate + ",");
             }
         }
 
         private void BtnOpen_Click(object sender, EventArgs e)
         {
-            if (!File.Exists(FileName)) return;
+            if (!File.Exists(FileName))
+            {
+                statusMsg.Text = "No files ";
+                return;
+            }
+
             taggedList.Clear();
             untaggedList.Clear();
-            using (StreamReader sr = new(FileName))
-            {
-                for (string[]? line = sr.ReadLine()?.Split(","); line != null; line = sr.ReadLine()?.Split(","))
+            using (var op = new StreamReader(FileName))
+                for (string? line = op.ReadLine(); line != null; line = op.ReadLine())
                 {
-                    if (line.Length >= 2 && line[1] == "*")
-                        taggedList.Add(line[0]);
-                    else
-                        untaggedList.Add(line[0]);
-
+                    string[] plate = line.Split(",");
+                    if (ValidPlate().IsMatch(plate[0]))
+                        (plate.Length >= 2 && plate[1] == "*"
+                            ? taggedList
+                            : untaggedList).Add(plate[0]);
                 }
-            }
+
             SyncLists(Box.BOTH);
         }
+        #endregion
 
         private enum Box { TAGGED, UNTAGGED, BOTH }
     }
