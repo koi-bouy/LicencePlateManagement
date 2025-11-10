@@ -65,6 +65,16 @@ namespace LicencePlateManager
             SyncLists(Box.BOTH);
         }
 
+        //private void btnTag_Click(object sender, EventArgs e)
+        //{
+        //    string[] selItems = [.. lstTagged.SelectedItems.Cast<string>()];
+        //    foreach (int index in lstTagged.SelectedIndices.Cast<int>())
+        //    {
+        //        lstTagged.Items.
+        //    }
+            
+        //}
+
         private enum Box { TAGGED, UNTAGGED, BOTH }
 
 

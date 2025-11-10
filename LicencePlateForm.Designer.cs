@@ -28,7 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
-            Button button5;
+            Button btnTag;
             title = new Label();
             lblDay = new Label();
             subtitle = new Label();
@@ -51,20 +51,21 @@
             rdoBinary = new RadioButton();
             rdoLinear = new RadioButton();
             groupBox1 = new GroupBox();
-            button5 = new Button();
+            btnTag = new Button();
             ((System.ComponentModel.ISupportInitialize)pictureBox1).BeginInit();
             statusStrip1.SuspendLayout();
             groupBox1.SuspendLayout();
             SuspendLayout();
             // 
-            // button5
+            // btnTag
             // 
-            button5.Location = new Point(31, 367);
-            button5.Name = "button5";
-            button5.Size = new Size(94, 29);
-            button5.TabIndex = 15;
-            button5.Text = "Tag";
-            button5.UseVisualStyleBackColor = true;
+            btnTag.Location = new Point(31, 367);
+            btnTag.Name = "btnTag";
+            btnTag.Size = new Size(94, 29);
+            btnTag.TabIndex = 15;
+            btnTag.Text = "Tag";
+            btnTag.UseVisualStyleBackColor = true;
+            //btnTag.Click += btnTag_Click;
             // 
             // title
             // 
@@ -282,7 +283,7 @@
             Controls.Add(btnDelete);
             Controls.Add(btnSave);
             Controls.Add(btnReset);
-            Controls.Add(button5);
+            Controls.Add(btnTag);
             Controls.Add(btnEdit);
             Controls.Add(btnSearch);
             Controls.Add(btnAdd);
@@ -326,7 +327,7 @@
         private Button btnDelete;
         private Button btnSearch;
         private Button btnEdit;
-        private Button button5;
+        private Button btnTag;
         private Button btnReset;
         private Button btnSave;
         private Button button8;
