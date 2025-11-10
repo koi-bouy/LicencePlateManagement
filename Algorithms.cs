@@ -1,0 +1,137 @@
+﻿// Raphael Fernandes, 30099423, Sprint 2
+// Date: 20/10/2025
+// Version: 2.1
+// Name: Astronomical Processing
+// Class containing Sorting/Searching algorithms.
+// Can handle both ascending and descending sorts.
+namespace LicencePlateManagement
+{
+    /// <summary>
+    /// Binary Search and Bubble search algorithms for integer lists.
+    /// </summary>
+    public static class Algorithms
+    {
+        /// <summary>
+        /// Sort integer list in place using bubble sort algorithm
+        /// </summary>
+        /// <param name="list">list to sort</param>
+        /// <param name="asc">Whether to sort ascending or descending</param>
+        public static void BubbleSort(List<int> list, bool asc = true)
+        {
+            int max = list.Count;
+            int temp;
+            for (int end = max; end > 0; end--)
+            {
+                for (int i = 0, j = 1; j < max; i++, j++)
+                {
+                    if (asc ? list[i] > list[j] : list[i] < list[j])
+                    {
+                        temp = list[i];
+                        list[i] = list[j];
+                        list[j] = temp;
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Uses Binary Search to find a string in a list and return its index
+        /// </summary>
+        /// <param name="list">string list to search</param>
+        /// <param name="search">string to search for</param>
+        /// <returns>index of search item, or -1 if the item cannot be found</returns>
+        public static int BinarySearch(List<string> list, string search)
+        {
+            int start = 0;
+            int end = list.Count - 1;
+            int middle;
+            while (start <= end)
+            {
+                middle = (start + end) / 2;
+
+                int comparison = string.Compare(search, list[middle]);
+
+                if (comparison == 0)
+                    return middle;
+                else if (comparison < 0)
+                    end = middle - 1;
+                else
+                    start = middle + 1;
+            }
+            return -1;
+        }
+
+        /// <summary>
+        /// Loops through a list, from beginning to end,
+        /// And checks each item if it's search item
+        /// </summary>
+        /// <param name="list">string list to search</param>
+        /// <param name="search">string to search for</param>
+        /// <returns>index of the first occurence of the search item, or -1 if the item cannot be found</returns>
+        public static int SequentialSearch(List<string> list, string search)
+        {
+            for (int i = 0; i < list.Count; i++)
+            {
+                if (list[i] == search)
+                {
+                    return i;
+                }
+            }
+            return -1;
+        }
+
+        /// <summary>
+        /// Loops through a list, from beginning to end,
+        /// And checks each item if it's search item.
+        /// </summary>
+        /// <param name="list">string list to search</param>
+        /// <param name="search">list of strings to search for</param>
+        /// <returns>indices of all occurances of the search items.</returns>
+        public static List<int> SequentialSearchAll(List<string> list, List<string> search)
+        {
+            List<int> indices = [];
+            for (int i = 0; i < list.Count; i++)
+            {
+                if (search.Contains(list[i]))
+                {
+                    indices.Add(i);
+                }
+            }
+            return indices;
+        }
+
+        /// <summary>
+        /// Loops through a list, from beginning to end,
+        /// And checks each item if it's search item.
+        /// </summary>
+        /// <param name="list">string list to search</param>
+        /// <param name="search">string to search for</param>
+        /// <returns>indices of all occurances of the search item.</returns>
+        public static List<int> SequentialSearchAll(List<string> list, string search)
+        {
+            return SequentialSearchAll(list, [search]);
+        }
+
+        public static void Merge(List<string> list, string[] additions)
+        {
+            List<string> merged = [];
+            int lstPtr = 0, addPtr = 0;
+            while (lstPtr < list.Count && addPtr < additions.Length)
+                merged.Add((list[lstPtr].CompareTo(additions[addPtr]) < 0)
+                    ? list[lstPtr++]
+                    : additions[addPtr++]
+                    );
+
+            merged.AddRange(list[lstPtr..]);
+            merged.AddRange(additions[addPtr..]);
+
+            list.Clear();
+            list.AddRange(merged);
+        }
+
+        public static void AddSorted(List<string> list, string addition)
+        {
+            Algorithms.Merge(list, [addition]);
+        }
+    }
+}

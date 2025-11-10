@@ -1,4 +1,4 @@
-namespace LicencePlateManager
+namespace LicencePlateManagement
 {
     internal static class Program
     {

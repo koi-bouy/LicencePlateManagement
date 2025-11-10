@@ -1,4 +1,4 @@
-﻿namespace LicencePlateManager
+﻿namespace LicencePlateManagement
 {
     partial class LicencePlateForm
     {
@@ -28,7 +28,6 @@
         /// </summary>
         private void InitializeComponent()
         {
-            Button btnTag;
             title = new Label();
             lblDay = new Label();
             subtitle = new Label();
@@ -39,50 +38,51 @@
             lstUntagged = new ListBox();
             lstTagged = new ListBox();
             statusStrip1 = new StatusStrip();
-            toolStripStatusLabel1 = new ToolStripStatusLabel();
-            textBox1 = new TextBox();
+            statusMsg = new ToolStripStatusLabel();
+            txtInput = new TextBox();
             btnAdd = new Button();
             btnDelete = new Button();
             btnSearch = new Button();
             btnEdit = new Button();
             btnReset = new Button();
             btnSave = new Button();
-            button8 = new Button();
+            btnLoad = new Button();
             rdoBinary = new RadioButton();
             rdoLinear = new RadioButton();
-            groupBox1 = new GroupBox();
+            grpSearchAlgorithm = new GroupBox();
             btnTag = new Button();
             ((System.ComponentModel.ISupportInitialize)pictureBox1).BeginInit();
             statusStrip1.SuspendLayout();
-            groupBox1.SuspendLayout();
+            grpSearchAlgorithm.SuspendLayout();
             SuspendLayout();
             // 
             // btnTag
             // 
-            btnTag.Location = new Point(31, 367);
+            btnTag.Location = new Point(27, 275);
+            btnTag.Margin = new Padding(3, 2, 3, 2);
             btnTag.Name = "btnTag";
-            btnTag.Size = new Size(94, 29);
+            btnTag.Size = new Size(82, 24);
             btnTag.TabIndex = 15;
             btnTag.Text = "Tag";
             btnTag.UseVisualStyleBackColor = true;
-            //btnTag.Click += btnTag_Click;
+            btnTag.Click += BtnTag_Click;
             // 
             // title
             // 
             title.AutoSize = true;
             title.Font = new Font("Segoe UI", 16F);
-            title.Location = new Point(12, 9);
+            title.Location = new Point(10, 7);
             title.Name = "title";
-            title.Size = new Size(240, 37);
+            title.Size = new Size(197, 30);
             title.TabIndex = 0;
             title.Text = "Active Systems Pty.";
             // 
             // lblDay
             // 
             lblDay.AutoSize = true;
-            lblDay.Location = new Point(423, 48);
+            lblDay.Location = new Point(370, 36);
             lblDay.Name = "lblDay";
-            lblDay.Size = new Size(55, 20);
+            lblDay.Size = new Size(44, 15);
             lblDay.TabIndex = 1;
             lblDay.Text = "day {n}";
             // 
@@ -90,46 +90,47 @@
             // 
             subtitle.AutoSize = true;
             subtitle.Font = new Font("Segoe UI", 10F);
-            subtitle.Location = new Point(21, 46);
+            subtitle.Location = new Point(18, 34);
             subtitle.Name = "subtitle";
-            subtitle.Size = new Size(216, 23);
+            subtitle.Size = new Size(173, 19);
             subtitle.TabIndex = 2;
             subtitle.Text = "Licence Plate Management";
             // 
             // untaggedLabel
             // 
             untaggedLabel.AutoSize = true;
-            untaggedLabel.Location = new Point(31, 151);
+            untaggedLabel.Location = new Point(28, 79);
             untaggedLabel.Name = "untaggedLabel";
-            untaggedLabel.Size = new Size(118, 20);
+            untaggedLabel.Size = new Size(93, 15);
             untaggedLabel.TabIndex = 3;
             untaggedLabel.Text = "Untagged Plates";
             // 
             // label5
             // 
             label5.AutoSize = true;
-            label5.Location = new Point(187, 177);
+            label5.Location = new Point(165, 99);
             label5.Name = "label5";
-            label5.Size = new Size(39, 20);
+            label5.Size = new Size(30, 15);
             label5.TabIndex = 4;
             label5.Text = "Edit ";
             // 
             // lblTagged
             // 
             lblTagged.AutoSize = true;
-            lblTagged.Location = new Point(463, 151);
-            lblTagged.Margin = new Padding(0, 3, 0, 3);
+            lblTagged.Location = new Point(406, 79);
+            lblTagged.Margin = new Padding(0, 2, 0, 2);
             lblTagged.Name = "lblTagged";
-            lblTagged.Size = new Size(128, 20);
+            lblTagged.Size = new Size(101, 15);
             lblTagged.TabIndex = 5;
             lblTagged.Text = "Tagged for review";
             // 
             // pictureBox1
             // 
             pictureBox1.Image = LicencePlateManagement.Properties.Resources.Logo;
-            pictureBox1.Location = new Point(258, 12);
+            pictureBox1.Location = new Point(226, 9);
+            pictureBox1.Margin = new Padding(3, 2, 3, 2);
             pictureBox1.Name = "pictureBox1";
-            pictureBox1.Size = new Size(66, 69);
+            pictureBox1.Size = new Size(58, 52);
             pictureBox1.SizeMode = PictureBoxSizeMode.Zoom;
             pictureBox1.TabIndex = 6;
             pictureBox1.TabStop = false;
@@ -137,115 +138,133 @@
             // lstUntagged
             // 
             lstUntagged.FormattingEnabled = true;
-            lstUntagged.Location = new Point(31, 177);
+            lstUntagged.Location = new Point(28, 99);
+            lstUntagged.Margin = new Padding(3, 2, 3, 2);
             lstUntagged.Name = "lstUntagged";
-            lstUntagged.Size = new Size(150, 184);
+            lstUntagged.SelectionMode = SelectionMode.MultiExtended;
+            lstUntagged.Size = new Size(132, 169);
             lstUntagged.TabIndex = 7;
+            lstUntagged.SelectedIndexChanged += SelectedIndexChanged;
             // 
             // lstTagged
             // 
             lstTagged.FormattingEnabled = true;
-            lstTagged.Location = new Point(463, 177);
+            lstTagged.Location = new Point(406, 99);
+            lstTagged.Margin = new Padding(3, 2, 3, 2);
             lstTagged.Name = "lstTagged";
-            lstTagged.Size = new Size(150, 184);
+            lstTagged.SelectionMode = SelectionMode.MultiExtended;
+            lstTagged.Size = new Size(132, 169);
             lstTagged.TabIndex = 8;
+            lstTagged.SelectedIndexChanged += SelectedIndexChanged;
             // 
             // statusStrip1
             // 
             statusStrip1.ImageScalingSize = new Size(20, 20);
-            statusStrip1.Items.AddRange(new ToolStripItem[] { toolStripStatusLabel1 });
-            statusStrip1.Location = new Point(0, 424);
+            statusStrip1.Items.AddRange(new ToolStripItem[] { statusMsg });
+            statusStrip1.Location = new Point(0, 316);
             statusStrip1.Name = "statusStrip1";
-            statusStrip1.Size = new Size(629, 26);
+            statusStrip1.Padding = new Padding(1, 0, 12, 0);
+            statusStrip1.Size = new Size(550, 22);
             statusStrip1.TabIndex = 9;
             statusStrip1.Text = "statusStrip1";
             // 
-            // toolStripStatusLabel1
+            // statusMsg
             // 
-            toolStripStatusLabel1.Name = "toolStripStatusLabel1";
-            toolStripStatusLabel1.Size = new Size(184, 20);
-            toolStripStatusLabel1.Text = "Messages will appear here";
+            statusMsg.Name = "statusMsg";
+            statusMsg.Size = new Size(144, 17);
+            statusMsg.Text = "Messages will appear here";
             // 
-            // textBox1
+            // txtInput
             // 
-            textBox1.Location = new Point(187, 200);
-            textBox1.Name = "textBox1";
-            textBox1.Size = new Size(270, 27);
-            textBox1.TabIndex = 10;
+            txtInput.Location = new Point(165, 116);
+            txtInput.Margin = new Padding(3, 2, 3, 2);
+            txtInput.Name = "txtInput";
+            txtInput.Size = new Size(237, 23);
+            txtInput.TabIndex = 10;
             // 
             // btnAdd
             // 
-            btnAdd.Location = new Point(187, 268);
+            btnAdd.Location = new Point(165, 167);
+            btnAdd.Margin = new Padding(3, 2, 3, 2);
             btnAdd.Name = "btnAdd";
-            btnAdd.Size = new Size(94, 29);
+            btnAdd.Size = new Size(82, 22);
             btnAdd.TabIndex = 11;
             btnAdd.Text = "Add";
             btnAdd.UseVisualStyleBackColor = true;
-            btnAdd.Click += btnAdd_Click;
+            btnAdd.Click += Add;
             // 
             // btnDelete
             // 
-            btnDelete.Location = new Point(187, 337);
+            btnDelete.Location = new Point(165, 219);
+            btnDelete.Margin = new Padding(3, 2, 3, 2);
             btnDelete.Name = "btnDelete";
-            btnDelete.Size = new Size(94, 29);
+            btnDelete.Size = new Size(82, 22);
             btnDelete.TabIndex = 12;
             btnDelete.Text = "Delete";
             btnDelete.UseVisualStyleBackColor = true;
             // 
             // btnSearch
             // 
-            btnSearch.Location = new Point(363, 235);
+            btnSearch.Location = new Point(319, 142);
+            btnSearch.Margin = new Padding(3, 2, 3, 2);
             btnSearch.Name = "btnSearch";
-            btnSearch.Size = new Size(94, 29);
+            btnSearch.Size = new Size(82, 22);
             btnSearch.TabIndex = 13;
             btnSearch.Text = "Search";
             btnSearch.UseVisualStyleBackColor = true;
+            btnSearch.Click += BtnSearch_Click;
             // 
             // btnEdit
             // 
-            btnEdit.Location = new Point(187, 233);
+            btnEdit.Location = new Point(165, 141);
+            btnEdit.Margin = new Padding(3, 2, 3, 2);
             btnEdit.Name = "btnEdit";
-            btnEdit.Size = new Size(94, 29);
+            btnEdit.Size = new Size(82, 22);
             btnEdit.TabIndex = 14;
             btnEdit.Text = "Edit";
             btnEdit.UseVisualStyleBackColor = true;
+            btnEdit.Click += BtnEdit_Click;
             // 
             // btnReset
             // 
             btnReset.BackColor = Color.Red;
             btnReset.ForeColor = SystemColors.Window;
-            btnReset.Location = new Point(519, 392);
+            btnReset.Location = new Point(458, 292);
+            btnReset.Margin = new Padding(3, 2, 3, 2);
             btnReset.Name = "btnReset";
-            btnReset.Size = new Size(94, 29);
+            btnReset.Size = new Size(82, 22);
             btnReset.TabIndex = 16;
             btnReset.Text = "Reset";
             btnReset.UseVisualStyleBackColor = false;
-            btnReset.Click += btnReset_Click;
+            btnReset.Click += BtnReset_Click;
             // 
             // btnSave
             // 
-            btnSave.Location = new Point(423, 12);
+            btnSave.Location = new Point(370, 9);
+            btnSave.Margin = new Padding(3, 2, 3, 2);
             btnSave.Name = "btnSave";
-            btnSave.Size = new Size(94, 29);
+            btnSave.Size = new Size(82, 22);
             btnSave.TabIndex = 17;
             btnSave.Text = "Save";
             btnSave.UseVisualStyleBackColor = true;
             // 
-            // button8
+            // btnLoad
             // 
-            button8.Location = new Point(523, 12);
-            button8.Name = "button8";
-            button8.Size = new Size(94, 29);
-            button8.TabIndex = 18;
-            button8.Text = "Load";
-            button8.UseVisualStyleBackColor = true;
+            btnLoad.Location = new Point(458, 9);
+            btnLoad.Margin = new Padding(3, 2, 3, 2);
+            btnLoad.Name = "btnLoad";
+            btnLoad.Size = new Size(82, 22);
+            btnLoad.TabIndex = 18;
+            btnLoad.Text = "Load";
+            btnLoad.UseVisualStyleBackColor = true;
             // 
             // rdoBinary
             // 
             rdoBinary.AutoSize = true;
-            rdoBinary.Location = new Point(6, 26);
+            rdoBinary.Location = new Point(5, 20);
+            rdoBinary.Margin = new Padding(3, 2, 3, 2);
             rdoBinary.Name = "rdoBinary";
-            rdoBinary.Size = new Size(71, 24);
+            rdoBinary.Size = new Size(58, 19);
             rdoBinary.TabIndex = 19;
             rdoBinary.TabStop = true;
             rdoBinary.Text = "Binary";
@@ -254,32 +273,35 @@
             // rdoLinear
             // 
             rdoLinear.AutoSize = true;
-            rdoLinear.Location = new Point(6, 56);
+            rdoLinear.Location = new Point(5, 42);
+            rdoLinear.Margin = new Padding(3, 2, 3, 2);
             rdoLinear.Name = "rdoLinear";
-            rdoLinear.Size = new Size(70, 24);
+            rdoLinear.Size = new Size(57, 19);
             rdoLinear.TabIndex = 20;
             rdoLinear.TabStop = true;
             rdoLinear.Text = "Linear";
             rdoLinear.UseVisualStyleBackColor = true;
             // 
-            // groupBox1
+            // grpSearchAlgorithm
             // 
-            groupBox1.Controls.Add(rdoBinary);
-            groupBox1.Controls.Add(rdoLinear);
-            groupBox1.Location = new Point(287, 270);
-            groupBox1.Name = "groupBox1";
-            groupBox1.Size = new Size(170, 96);
-            groupBox1.TabIndex = 21;
-            groupBox1.TabStop = false;
-            groupBox1.Text = "Search Algorithm";
+            grpSearchAlgorithm.Controls.Add(rdoBinary);
+            grpSearchAlgorithm.Controls.Add(rdoLinear);
+            grpSearchAlgorithm.Location = new Point(252, 168);
+            grpSearchAlgorithm.Margin = new Padding(3, 2, 3, 2);
+            grpSearchAlgorithm.Name = "grpSearchAlgorithm";
+            grpSearchAlgorithm.Padding = new Padding(3, 2, 3, 2);
+            grpSearchAlgorithm.Size = new Size(149, 72);
+            grpSearchAlgorithm.TabIndex = 21;
+            grpSearchAlgorithm.TabStop = false;
+            grpSearchAlgorithm.Text = "Search Algorithm";
             // 
             // LicencePlateForm
             // 
-            AutoScaleDimensions = new SizeF(8F, 20F);
+            AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(629, 450);
-            Controls.Add(groupBox1);
-            Controls.Add(button8);
+            ClientSize = new Size(550, 338);
+            Controls.Add(grpSearchAlgorithm);
+            Controls.Add(btnLoad);
             Controls.Add(btnDelete);
             Controls.Add(btnSave);
             Controls.Add(btnReset);
@@ -287,7 +309,7 @@
             Controls.Add(btnEdit);
             Controls.Add(btnSearch);
             Controls.Add(btnAdd);
-            Controls.Add(textBox1);
+            Controls.Add(txtInput);
             Controls.Add(statusStrip1);
             Controls.Add(lstTagged);
             Controls.Add(lstUntagged);
@@ -298,13 +320,14 @@
             Controls.Add(subtitle);
             Controls.Add(lblDay);
             Controls.Add(title);
+            Margin = new Padding(3, 2, 3, 2);
             Name = "LicencePlateForm";
             Text = "Active Systems Pty.";
             ((System.ComponentModel.ISupportInitialize)pictureBox1).EndInit();
             statusStrip1.ResumeLayout(false);
             statusStrip1.PerformLayout();
-            groupBox1.ResumeLayout(false);
-            groupBox1.PerformLayout();
+            grpSearchAlgorithm.ResumeLayout(false);
+            grpSearchAlgorithm.PerformLayout();
             ResumeLayout(false);
             PerformLayout();
         }
@@ -321,8 +344,8 @@
         private ListBox lstUntagged;
         private ListBox lstTagged;
         private StatusStrip statusStrip1;
-        private ToolStripStatusLabel toolStripStatusLabel1;
-        private TextBox textBox1;
+        private ToolStripStatusLabel statusMsg;
+        private TextBox txtInput;
         private Button btnAdd;
         private Button btnDelete;
         private Button btnSearch;
@@ -330,9 +353,9 @@
         private Button btnTag;
         private Button btnReset;
         private Button btnSave;
-        private Button button8;
+        private Button btnLoad;
         private RadioButton rdoBinary;
         private RadioButton rdoLinear;
-        private GroupBox groupBox1;
+        private GroupBox grpSearchAlgorithm;
     }
 }
