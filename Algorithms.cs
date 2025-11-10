@@ -12,29 +12,6 @@ namespace LicencePlateManagement
     public static class Algorithms
     {
         /// <summary>
-        /// Sort integer list in place using bubble sort algorithm
-        /// </summary>
-        /// <param name="list">list to sort</param>
-        /// <param name="asc">Whether to sort ascending or descending</param>
-        public static void BubbleSort(List<int> list, bool asc = true)
-        {
-            int max = list.Count;
-            int temp;
-            for (int end = max; end > 0; end--)
-            {
-                for (int i = 0, j = 1; j < max; i++, j++)
-                {
-                    if (asc ? list[i] > list[j] : list[i] < list[j])
-                    {
-                        temp = list[i];
-                        list[i] = list[j];
-                        list[j] = temp;
-                    }
-                }
-            }
-        }
-
-        /// <summary>
         /// Uses Binary Search to find a string in a list and return its index
         /// </summary>
         /// <param name="list">string list to search</param>
@@ -80,38 +57,12 @@ namespace LicencePlateManagement
             return -1;
         }
 
-        /// <summary>
-        /// Loops through a list, from beginning to end,
-        /// And checks each item if it's search item.
-        /// </summary>
-        /// <param name="list">string list to search</param>
-        /// <param name="search">list of strings to search for</param>
-        /// <returns>indices of all occurances of the search items.</returns>
-        public static List<int> SequentialSearchAll(List<string> list, List<string> search)
-        {
-            List<int> indices = [];
-            for (int i = 0; i < list.Count; i++)
-            {
-                if (search.Contains(list[i]))
-                {
-                    indices.Add(i);
-                }
-            }
-            return indices;
-        }
 
         /// <summary>
-        /// Loops through a list, from beginning to end,
-        /// And checks each item if it's search item.
+        /// Merge sorts a string array into a string list
         /// </summary>
-        /// <param name="list">string list to search</param>
-        /// <param name="search">string to search for</param>
-        /// <returns>indices of all occurances of the search item.</returns>
-        public static List<int> SequentialSearchAll(List<string> list, string search)
-        {
-            return SequentialSearchAll(list, [search]);
-        }
-
+        /// <param name="list">List to merge into</param>
+        /// <param name="additions">array to merge into List</param>
         public static void Merge(List<string> list, string[] additions)
         {
             List<string> merged = [];
@@ -129,6 +80,11 @@ namespace LicencePlateManagement
             list.AddRange(merged);
         }
 
+        /// <summary>
+        /// Uses Merge to add a tring to a List while maintaining sort order.
+        /// </summary>
+        /// <param name="list"></param>
+        /// <param name="addition"></param>
         public static void AddSorted(List<string> list, string addition)
         {
             Algorithms.Merge(list, [addition]);
