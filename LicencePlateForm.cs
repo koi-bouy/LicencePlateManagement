@@ -1,3 +1,8 @@
+// Raphael Fernandes, 30099423
+// Date: 17/11/2025
+// Version: 1.0
+// Name: Active Systems Pty. Library Management System
+// Logic for program that keeps track of West Australian licence plates.
 using System.Text.RegularExpressions;
 
 namespace LicencePlateManagement
@@ -9,7 +14,7 @@ namespace LicencePlateManagement
 
 
 
-        (ListBox lstBox, List<string> lst, Box syn) selected;
+        (ListBox lstBox, List<string> lst, SyncOption syn) selected;
 
         public LicencePlateForm()
         {
@@ -24,7 +29,7 @@ namespace LicencePlateManagement
             selected = (
                 lstUntagged,
                 untaggedList,
-                Box.UNTAGGED
+                SyncOption.UNTAGGED
             );
 
 
@@ -65,7 +70,7 @@ namespace LicencePlateManagement
                 Algorithms.AddSorted(untaggedList, selItem);
 
                 // Sync list and select plate in untagged list
-                SyncLists(Box.BOTH);
+                SyncLists(SyncOption.BOTH);
                 lstUntagged.SelectedItem = selItem;
 
                 statusMsg.Text = "Untagged plate: " + selItem;
@@ -102,7 +107,7 @@ namespace LicencePlateManagement
             if (ValidatePlate(newPlate))
             {
                 Algorithms.AddSorted(untaggedList, newPlate);
-                SyncLists(Box.UNTAGGED);
+                SyncLists(SyncOption.UNTAGGED);
                 lstUntagged.SelectedItem = newPlate;
 
                 // Clear and focus input box for next input
@@ -136,16 +141,16 @@ namespace LicencePlateManagement
             }
         }
 
-        private void SyncLists(Box category)
+        private void SyncLists(SyncOption category)
         {
 
-            if (category is Box.TAGGED or Box.BOTH)
+            if (category is SyncOption.TAGGED or SyncOption.BOTH)
             {
                 lstTagged.Items.Clear();
                 lstTagged.Items.AddRange([.. taggedList]);
             }
 
-            if (category is Box.UNTAGGED or Box.BOTH)
+            if (category is SyncOption.UNTAGGED or SyncOption.BOTH)
             {
                 lstUntagged.Items.Clear();
                 lstUntagged.Items.AddRange([.. untaggedList]);
@@ -160,7 +165,8 @@ namespace LicencePlateManagement
             untaggedList.Clear();
             taggedList.Clear();
             txtInput.Clear();
-            SyncLists(Box.BOTH);
+            SyncLists(SyncOption.BOTH);
+            statusMsg.Text = "Reset all data.";
         }
 
         /// <summary>
@@ -168,15 +174,15 @@ namespace LicencePlateManagement
         /// </summary>
         private void BtnTag_Click(object? sender, EventArgs e)
         {
-            var selItem = (string?)lstUntagged.SelectedItem;
             int selIndx = lstUntagged.SelectedIndex;
 
-            if (selItem != null)
+            if (lstUntagged.SelectedItem is string selItem)
             {
                 untaggedList.RemoveAt(selIndx);
                 Algorithms.AddSorted(taggedList, selItem);
-                SyncLists(Box.BOTH);
+                SyncLists(SyncOption.BOTH);
                 lstTagged.SelectedItem = selItem;
+                statusMsg.Text = "Tagged plate: " + selItem;
             }
             else
                 statusMsg.Text = "Nothing Selected";
@@ -194,51 +200,59 @@ namespace LicencePlateManagement
         private void BtnBinSearch_Click(object sender, EventArgs e)
         {
             statusMsg.Text = $"Searching for {Input} with Binary Search: ";
-            int result;
-            if ((result = selected.lst.BinarySearch(Input)) != -1)
+            if (untaggedList.BinarySearch(Input, StringComparer.OrdinalIgnoreCase) is int result && result != -1)
             {
+                lstUntagged.SelectedIndex = result;
                 statusMsg.Text += $"Found in untagged plates at index {result}";
             }
             else
+            {
                 statusMsg.Text += "Plate not found";
+                txtInput.Clear();
+            }
         }
 
-
+        /// <summary>
+        /// 
+        /// </summary>
         private void BtnSeqSearch_Click(object sender, EventArgs e)
         {
-            MessageBox.Show(e.ToString());
             statusMsg.Text = $"Searching for {Input} with Sequential Search: ";
-            int result;
-            if ((result = Algorithms.LinearSearch(selected.lst, Input)) != -1)
+            if (Algorithms.LinearSearch(selected.lst, Input) is int result && result != -1)
             {
+                lstUntagged.SelectedIndex = result;
                 statusMsg.Text += $"Found in untagged plates at index {result}";
             }
-            statusMsg.Text += "Plate not found";
+            else
+            {
+                statusMsg.Text += "Plate not found";
+                txtInput.Clear();
+            }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
         private void SelectedIndexChanged(object sender, EventArgs e)
         {
             var selBox = (ListBox)sender;
             List<string> lst;
-            Box syncList;
+            SyncOption syncList;
             if (selBox.Name.Contains("Untagged"))
             {
                 lst = untaggedList;
-                syncList = Box.UNTAGGED;
+                syncList = SyncOption.UNTAGGED;
             }
             else
             {
-
                 lst = taggedList;
-                syncList = Box.TAGGED;
+                syncList = SyncOption.TAGGED;
             }
-            this.selected = (selBox, lst, syncList);
+            selected = (selBox, lst, syncList);
 
-            string? selected = (string?)this.selected.lstBox.SelectedItem;
-
-            if (selected != null)
+            if (selected.lstBox.SelectedItem is string selItem)
             {
-                Input = selected;
+                Input = selItem;
             }
         }
 
@@ -264,11 +278,14 @@ namespace LicencePlateManagement
         private void DeleteSelected()
         {
             int selndx = selected.lstBox.SelectedIndex;
-            if (selndx != -1)
+            if (selected.lstBox.SelectedItem is string selItem)
             {
                 selected.lst.RemoveAt(selndx);
                 SyncLists(selected.syn);
+                statusMsg.Text = "Deleted plate: " + selItem;
             }
+            else
+                statusMsg.Text = "Nothing selected to delete.";
         }
         #region File Management
         private string FileName
@@ -364,7 +381,7 @@ namespace LicencePlateManagement
                 }
                 statusMsg.Text = "Successfully loaded from file: " + fileName;
                 SetFileLabel(fileName);
-                SyncLists(Box.BOTH);
+                SyncLists(SyncOption.BOTH);
             }
             catch (Exception ex)
             {
@@ -416,6 +433,33 @@ namespace LicencePlateManagement
 
         #endregion
 
-        private enum Box { TAGGED, UNTAGGED, BOTH }
+
+        private void UnselectTagged(object? _, EventArgs __)
+        {
+            lstUntagged.SelectedItem = null;
+        }
+        private void UnselectUntagged(object? _, EventArgs __)
+        {
+            lstTagged.SelectedItem = null;
+        }
+
+        /// <summary>
+        /// Tells SyncLists which lists to sync
+        /// </summary>
+        private enum SyncOption
+        {
+            /// <summary>
+            /// Sync only Tagged List
+            /// </summary>
+            TAGGED,
+            /// <summary>
+            /// Sync only Untagged List
+            /// </summary>
+            UNTAGGED,
+            /// <summary>
+            /// Sync both Lists
+            /// </summary>
+            BOTH
+        }
     }
 }

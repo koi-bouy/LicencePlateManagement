@@ -1,3 +1,8 @@
+// Raphael Fernandes, 30099423
+// Date: 3/11/2025
+// Version: 1.0
+// Name: Active Systems Pty. Library Management System
+// Program that keeps track of West Australian licence plates.
 namespace LicencePlateManagement
 {
     internal static class Program

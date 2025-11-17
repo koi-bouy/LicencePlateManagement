@@ -297,6 +297,9 @@
             // 
             // btnSeqSearch
             // 
+
+            lstUntagged.Click += UnselectUntagged;
+            lstTagged.Click += UnselectTagged;
             btnSeqSearch.Cursor = Cursors.Hand;
             btnSeqSearch.Location = new Point(5, 46);
             btnSeqSearch.Margin = new Padding(3, 2, 3, 2);
@@ -361,7 +364,7 @@
             Margin = new Padding(3, 2, 3, 2);
             Name = "LicencePlateForm";
             Text = "Active Systems Pty.";
-            FormClosed += OnClose;
+            FormClosed += SaveOnClose;
             ((System.ComponentModel.ISupportInitialize)logo).EndInit();
             statusStrip1.ResumeLayout(false);
             statusStrip1.PerformLayout();
