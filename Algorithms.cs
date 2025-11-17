@@ -17,7 +17,7 @@ namespace LicencePlateManagement
         /// <param name="list">string list to search</param>
         /// <param name="search">string to search for</param>
         /// <returns>index of the first occurence of the search item, or -1 if the item cannot be found</returns>
-        public static int SequentialSearch(List<string> list, string search)
+        public static int LinearSearch(List<string> list, string search)
         {
             for (int i = 0; i < list.Count; i++)
             {

@@ -9,94 +9,129 @@ namespace LicencePlateManagement
 
 
 
-        (ListBox lstBox, List<string> lst, Box syn) selectedList;
+        (ListBox lstBox, List<string> lst, Box syn) selected;
 
         public LicencePlateForm()
         {
             InitializeComponent();
 
-            openFileDialog1.InitialDirectory =
-            saveFileDialog1.InitialDirectory = Environment.CurrentDirectory;
+            // Set file dialogs to open in the current directory (where the program was executed from) by default
+            dlgOpen.InitialDirectory =
+            dlgSave.InitialDirectory = Environment.CurrentDirectory;
 
-            lstUntagged.MouseDoubleClick += Delete_DoubleClick;
-            lstTagged.MouseDoubleClick += Untag;
-            txtInput.KeyPress += TxtInput_EnterPressed;
-            selectedList = (
+
+            // Initalise selectedList tuple to point to untagged list.
+            selected = (
                 lstUntagged,
                 untaggedList,
                 Box.UNTAGGED
             );
+
+
+            // Set all buttons to refocus on the the input when clicked
+            void FocusInput(object? _, EventArgs __) => txtInput.Focus();
+            object[] controls = [.. Controls, .. grpSearch.Controls];
+            foreach (Button b in controls.Where(c => c is Button).Cast<Button>())
+            {
+                b.Click += FocusInput;
+            }
+
+            CalculateFileNumber();
         }
 
+        /// <summary>
+        /// Calls add button method when the enter key is pressed in the input text box
+        /// </summary>
         private void TxtInput_EnterPressed(object? sender, KeyPressEventArgs e)
         {
             if (e.KeyChar == '\r')
             {
-                Add(sender, e);
+                BtnAdd_Click(null, new());
             }
         }
 
-        private void FocusText(object? sender, MouseEventArgs e) => txtInput.Focus();
 
-        private void Untag(object? sender, MouseEventArgs e)
+        private void Untag(object? sender, EventArgs e)
         {
-            var selItem = (string?)lstTagged.SelectedItem;
+
             int selIndx = lstTagged.SelectedIndex;
 
-            if (selItem != null)
+            // Checks if the selected item is a string type (not null)
+            // and assigns it to a variable if it is
+            if (lstTagged.SelectedItem is string selItem)
             {
+                // Move plate
                 taggedList.RemoveAt(selIndx);
                 Algorithms.AddSorted(untaggedList, selItem);
+
+                // Sync list and select plate in untagged list
                 SyncLists(Box.BOTH);
                 lstUntagged.SelectedItem = selItem;
 
+                statusMsg.Text = "Untagged plate: " + selItem;
             }
             else
                 statusMsg.Text = "Nothing Selected";
         }
 
+        // Regex for testing if a plate is valid or not.
         [GeneratedRegex(@"^1[A-Z]{3}-\d{3}$")]
         private static partial Regex ValidPlate();
 
-        private void Add(object? sender, EventArgs e)
+        private bool ValidatePlate(string plate)
         {
-            string newPlate = Input.ToUpper();
-            txtInput.Clear();
-            if (untaggedList.Contains(newPlate) || taggedList.Contains(newPlate))
+            if (untaggedList.Contains(plate) || taggedList.Contains(plate))
             {
                 statusMsg.Text = "Plate already in list";
+                return false;
             }
-            else if (ValidPlate().IsMatch(newPlate))
+            else if (!ValidPlate().IsMatch(plate))
+            {
+                statusMsg.Text = "Invalid Plate Format. Must be 1[3 letters]_[3 digits]";
+                return false;
+            }
+            return true;
+        }
+
+        /// <summary>
+        /// Add plate from input to main untagged list if it's valid and doesn't already exist
+        /// </summary>
+        private void BtnAdd_Click(object? sender, EventArgs e)
+        {
+            string newPlate = Input.ToUpper();
+            if (ValidatePlate(newPlate))
             {
                 Algorithms.AddSorted(untaggedList, newPlate);
                 SyncLists(Box.UNTAGGED);
                 lstUntagged.SelectedItem = newPlate;
-                statusMsg.Text = $"Added Plate {newPlate}";
 
+                // Clear and focus input box for next input
+                txtInput.Clear();
+
+                statusMsg.Text = $"Added Plate: {newPlate}";
             }
-            else
-                statusMsg.Text = "Invalid Plate";
-
-
         }
 
+        /// <summary>
+        /// Edits the selected plate, performing the same validation as 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void BtnEdit_Click(object sender, EventArgs e)
         {
             string newPlate = Input.ToUpper();
-            string? oldPlate = (string?)selectedList.lstBox.SelectedItem;
-
+            string? oldPlate = (string?)selected.lstBox.SelectedItem;
+            if (!ValidatePlate(newPlate)) return;
             if (oldPlate == null)
+            {
                 statusMsg.Text = "No plate selected to edit";
-            else if (untaggedList.Contains(newPlate) || taggedList.Contains(newPlate))
-                statusMsg.Text = "Plate already in list";
-            else if (!ValidPlate().IsMatch(newPlate))
-                statusMsg.Text = "Invalid Plate";
+            }
             else
             {
-                selectedList.lst[selectedList.lstBox.SelectedIndex] = newPlate;
+                selected.lst[selected.lstBox.SelectedIndex] = newPlate;
                 statusMsg.Text = $"Edited Plate {oldPlate} to be {newPlate}";
-                SyncLists(selectedList.syn);
-                selectedList.lstBox.SelectedItem = newPlate;
+                SyncLists(selected.syn);
+                selected.lstBox.SelectedItem = newPlate;
 
             }
         }
@@ -160,7 +195,7 @@ namespace LicencePlateManagement
         {
             statusMsg.Text = $"Searching for {Input} with Binary Search: ";
             int result;
-            if ((result = selectedList.lst.BinarySearch(Input)) != -1)
+            if ((result = selected.lst.BinarySearch(Input)) != -1)
             {
                 statusMsg.Text += $"Found in untagged plates at index {result}";
             }
@@ -168,11 +203,13 @@ namespace LicencePlateManagement
                 statusMsg.Text += "Plate not found";
         }
 
+
         private void BtnSeqSearch_Click(object sender, EventArgs e)
         {
+            MessageBox.Show(e.ToString());
             statusMsg.Text = $"Searching for {Input} with Sequential Search: ";
             int result;
-            if ((result = Algorithms.SequentialSearch(selectedList.lst, Input)) != -1)
+            if ((result = Algorithms.LinearSearch(selected.lst, Input)) != -1)
             {
                 statusMsg.Text += $"Found in untagged plates at index {result}";
             }
@@ -195,9 +232,9 @@ namespace LicencePlateManagement
                 lst = taggedList;
                 syncList = Box.TAGGED;
             }
-            selectedList = (selBox, lst, syncList);
+            this.selected = (selBox, lst, syncList);
 
-            string? selected = (string?)selectedList.lstBox.SelectedItem;
+            string? selected = (string?)this.selected.lstBox.SelectedItem;
 
             if (selected != null)
             {
@@ -206,26 +243,31 @@ namespace LicencePlateManagement
         }
 
         /// <summary>
-        /// Deletes the selected item
+        /// Removes the selected plate
         /// </summary>
         private void BtnExit_Click(object? sender, EventArgs e)
         {
             DeleteSelected();
-            txtInput.Focus();
         }
 
+        /// <summary>
+        /// Deletes the selected plate on double click
+        /// </summary>
         private void Delete_DoubleClick(object? sender, MouseEventArgs e)
         {
             DeleteSelected();
         }
 
+        /// <summary>
+        /// Deletes the selected plate
+        /// </summary>
         private void DeleteSelected()
         {
-            int selndx = selectedList.lstBox.SelectedIndex;
+            int selndx = selected.lstBox.SelectedIndex;
             if (selndx != -1)
             {
-                selectedList.lst.RemoveAt(selndx);
-                SyncLists(selectedList.syn);
+                selected.lst.RemoveAt(selndx);
+                SyncLists(selected.syn);
             }
         }
         #region File Management
@@ -235,64 +277,125 @@ namespace LicencePlateManagement
         private int FileNo
         {
             get => _fileNo;
-            set
-            {
-                _fileNo = value;
-                lblDay.Text = $"day {_fileNo}";
-            }
+            set => _fileNo = value;
         }
 
         private int _fileNo = 1;
 
+        /// <summary>
+        /// Increments the file number, skipping numbers that already exist.<br/>
+        /// Also updates the file path label
+        /// </summary>
         private void CalculateFileNumber()
         {
             var files = Directory.GetFiles(Directory.GetCurrentDirectory()).Select(Path.GetFileName);
 
             while (files.Contains(FileName))
                 FileNo++;
+
+            lblDay.Text = $"day {_fileNo:d2}";
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
         private void BtnSave_Click(object sender, EventArgs e)
         {
 
             CalculateFileNumber();
-            saveFileDialog1.FileName = FileName;
-            saveFileDialog1.ShowDialog();
+            dlgSave.FileName = FileName;
+            dlgSave.ShowDialog();
 
         }
 
+        /// <summary>
+        /// Spawns an open file dialog
+        /// </summary>
         private void BtnOpen_Click(object sender, EventArgs e)
+            => dlgOpen.ShowDialog();
+
+
+        // Regular expression to check file name format
+        [GeneratedRegex(@"^day_\d{2,}(\.\w+)$", RegexOptions.IgnoreCase | RegexOptions.IgnorePatternWhitespace)]
+        private static partial Regex FileFormat();
+
+        /// <summary>
+        /// Updates file path label to reflect loaded file.
+        /// </summary>
+        /// <param name="file">Name of file</param>
+        private void SetFileLabel(string file)
         {
-            CalculateFileNumber();
-            openFileDialog1.FileName = FileName;
-            openFileDialog1.ShowDialog();
-            SyncLists(Box.BOTH);
-        }
-
-
-        private void openFileDialog1_FileOk(object sender, System.ComponentModel.CancelEventArgs e)
-        {
-
-            string file = openFileDialog1.FileName;
-            taggedList.Clear();
-            untaggedList.Clear();
-            using var op = new StreamReader(openFileDialog1.FileName);
-            for (string? line = op.ReadLine(); line != null; line = op.ReadLine())
+            if (file != FileName)
             {
-                string[] plate = line.Split(",");
-                if (ValidPlate().IsMatch(plate[0]))
-                    (plate.Length >= 2 && plate[1] == "*"
-                        ? taggedList
-                        : untaggedList).Add(plate[0]);
+                if (FileFormat().IsMatch(file))
+                    // Remove file extention and underscore to just get $"day {no}"
+                    lblDay.Text = file.Split('.')[0].Replace('_', ' ');
+                else
+                    lblDay.Text = $"File name: {file}";
+            }
+            else
+            {
+                CalculateFileNumber();
             }
         }
 
-        private void saveFileDialog1_FileOk(object sender, System.ComponentModel.CancelEventArgs e)
+        /// <summary>
+        /// Called from Open file dialog
+        /// </summary>
+        private void FileOpened(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+
+            string path = dlgOpen.FileName;
+            string fileName = Path.GetFileName(path);
+
+
+            taggedList.Clear();
+            untaggedList.Clear();
+            try
+            {
+                using var op = new StreamReader(path);
+                for (string? line = op.ReadLine(); line != null; line = op.ReadLine())
+                {
+                    string[] plate = line.Split(",");
+                    if (ValidPlate().IsMatch(plate[0]))
+                        (plate.Length >= 2 && plate[1] == "*"
+                            ? taggedList
+                            : untaggedList).Add(plate[0]);
+                }
+                statusMsg.Text = "Successfully loaded from file: " + fileName;
+                SetFileLabel(fileName);
+                SyncLists(Box.BOTH);
+            }
+            catch (Exception ex)
+            {
+                statusMsg.Text = $"Error while loading file {fileName}: " + ex.Message;
+            }
+        }
+
+        /// <summary>
+        /// Called from save dialog 
+        /// </summary>
+        private void FileSaved(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            string file = dlgSave.FileName;
+            Save(file);
+        }
+
+        /// <summary>
+        /// Saves on close
+        /// </summary>
+        private void SaveOnClose(object sender, EventArgs e)
+            => Save(FileName);
+
+        /// <summary>
+        /// Saves plates to file
+        /// </summary>
+        /// <param name="path">Path to file where plate data is to be saved.</param>
+        private void Save(string path)
         {
             try
             {
-                string file = saveFileDialog1.FileName;
-                using StreamWriter wr = new(file);
+                using StreamWriter wr = new(path);
                 foreach (string plate in taggedList)
                 {
                     wr.WriteLine(plate + ",*");
@@ -302,7 +405,8 @@ namespace LicencePlateManagement
                     wr.WriteLine(plate + ",");
                 }
 
-                statusMsg.Text = $"Saved as file {file}";
+                statusMsg.Text = $"Saved as file {path}";
+                SetFileLabel(Path.GetFileName(path));
             }
             catch (Exception ex)
             {
