@@ -272,6 +272,8 @@ namespace LicencePlateManagement
 
         private void openFileDialog1_FileOk(object sender, System.ComponentModel.CancelEventArgs e)
         {
+
+            string file = openFileDialog1.FileName;
             taggedList.Clear();
             untaggedList.Clear();
             using var op = new StreamReader(openFileDialog1.FileName);
@@ -287,15 +289,24 @@ namespace LicencePlateManagement
 
         private void saveFileDialog1_FileOk(object sender, System.ComponentModel.CancelEventArgs e)
         {
+            try
+            {
+                string file = saveFileDialog1.FileName;
+                using StreamWriter wr = new(file);
+                foreach (string plate in taggedList)
+                {
+                    wr.WriteLine(plate + ",*");
+                }
+                foreach (string plate in untaggedList)
+                {
+                    wr.WriteLine(plate + ",");
+                }
 
-            using StreamWriter wr = new(saveFileDialog1.FileName);
-            foreach (string plate in taggedList)
-            {
-                wr.WriteLine(plate + ",*");
+                statusMsg.Text = $"Saved as file {file}";
             }
-            foreach (string plate in untaggedList)
+            catch (Exception ex)
             {
-                wr.WriteLine(plate + ",");
+                statusMsg.Text = "Saving failed: " + ex.Message;
             }
         }
 

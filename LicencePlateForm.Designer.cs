@@ -177,7 +177,7 @@
             // 
             // btnExit
             // 
-            btnExit.Location = new Point(189, 292);
+            btnExit.Location = new Point(188, 259);
             btnExit.Name = "btnExit";
             btnExit.Size = new Size(94, 29);
             btnExit.TabIndex = 12;
@@ -185,10 +185,10 @@
             btnExit.UseVisualStyleBackColor = true;
             btnExit.Click += BtnExit_Click;
             // 
-            // btnSearch
+            // btnBinSearch
             // 
             btnBinSearch.Location = new Point(6, 26);
-            btnBinSearch.Name = "btnSearch";
+            btnBinSearch.Name = "btnBinSearch";
             btnBinSearch.Size = new Size(94, 29);
             btnBinSearch.TabIndex = 13;
             btnBinSearch.Text = "Binary";
@@ -241,29 +241,22 @@
             // 
             grpSearch.Controls.Add(btnSeqSearch);
             grpSearch.Controls.Add(btnBinSearch);
-            grpSearch.Location = new Point(311, 225);
+            grpSearch.Location = new Point(311, 189);
             grpSearch.Name = "grpSearch";
             grpSearch.Size = new Size(107, 96);
             grpSearch.TabIndex = 21;
             grpSearch.TabStop = false;
             grpSearch.Text = "Search";
             // 
-            // button1
+            // btnSeqSearch
             // 
             btnSeqSearch.Location = new Point(6, 61);
-            btnSeqSearch.Name = "button1";
+            btnSeqSearch.Name = "btnSeqSearch";
             btnSeqSearch.Size = new Size(94, 29);
             btnSeqSearch.TabIndex = 22;
             btnSeqSearch.Text = "Linear";
             btnSeqSearch.UseVisualStyleBackColor = true;
             btnSeqSearch.Click += BtnSeqSearch_Click;
-
-            openFileDialog1.DefaultExt = "txt";
-            saveFileDialog1.DefaultExt = "txt";
-
-
-            openFileDialog1.Filter = "Text Files (*.txt)| *.txt";
-            saveFileDialog1.Filter = "Text Files (*.txt)| *.txt";
             // 
             // btnTag
             // 
@@ -277,11 +270,15 @@
             // 
             // openFileDialog1
             // 
+            openFileDialog1.DefaultExt = "txt";
             openFileDialog1.FileName = "openFileDialog1";
+            openFileDialog1.Filter = "Text Files (*.txt)| *.txt";
             openFileDialog1.FileOk += openFileDialog1_FileOk;
             // 
             // saveFileDialog1
             // 
+            saveFileDialog1.DefaultExt = "txt";
+            saveFileDialog1.Filter = "Text Files (*.txt)| *.txt";
             saveFileDialog1.FileOk += saveFileDialog1_FileOk;
             // 
             // LicencePlateForm
