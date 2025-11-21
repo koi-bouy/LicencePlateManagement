@@ -49,9 +49,10 @@ namespace LicencePlateManagement
         /// </summary>
         private void TxtInput_EnterPressed(object? sender, KeyPressEventArgs e)
         {
-            if (e.KeyChar == '\r')
+            if (e.KeyChar == (char)Keys.Enter)
             {
                 BtnAdd_Click(null, new());
+                e.Handled = true;
             }
         }
 
@@ -85,14 +86,20 @@ namespace LicencePlateManagement
 
         private bool ValidatePlate(string plate)
         {
-            if (untaggedList.Contains(plate) || taggedList.Contains(plate))
+            string? listName = string.Empty;
+            if (untaggedList.Contains(plate))
+                listName = "untagged";
+            if (taggedList.Contains(plate))
+                listName = "tagged";
+
+            if (listName is not null)
             {
-                statusMsg.Text = "Plate already in list";
+                statusMsg.Text = $"Plate already in {listName} list";
                 return false;
             }
             else if (!ValidPlate().IsMatch(plate))
             {
-                statusMsg.Text = "Invalid Plate Format. Must be 1[3 letters]_[3 digits]";
+                statusMsg.Text = "Invalid Plate Format. Must be 1[3 letters]-[3 digits]";
                 return false;
             }
             return true;
@@ -126,18 +133,20 @@ namespace LicencePlateManagement
         {
             string newPlate = Input.ToUpper();
             string? oldPlate = (string?)selected.lstBox.SelectedItem;
-            if (!ValidatePlate(newPlate)) return;
-            if (oldPlate == null)
+            if (ValidatePlate(newPlate))
             {
-                statusMsg.Text = "No plate selected to edit";
-            }
-            else
-            {
-                selected.lst[selected.lstBox.SelectedIndex] = newPlate;
-                statusMsg.Text = $"Edited Plate {oldPlate} to be {newPlate}";
-                SyncLists(selected.syn);
-                selected.lstBox.SelectedItem = newPlate;
+                if (oldPlate == null)
+                {
+                    statusMsg.Text = "No plate selected to edit";
+                }
+                else
+                {
+                    selected.lst[selected.lstBox.SelectedIndex] = newPlate;
+                    statusMsg.Text = $"Edited Plate {oldPlate} to be {newPlate}";
+                    SyncLists(selected.syn);
+                    selected.lstBox.SelectedItem = newPlate;
 
+                }
             }
         }
 
@@ -213,12 +222,12 @@ namespace LicencePlateManagement
         }
 
         /// <summary>
-        /// 
+        /// Uses the Linear Search algorithm to find the input plate in the untagged list
         /// </summary>
-        private void BtnSeqSearch_Click(object sender, EventArgs e)
+        private void BtnLinSearch_Click(object sender, EventArgs e)
         {
-            statusMsg.Text = $"Searching for {Input} with Sequential Search: ";
-            if (Algorithms.LinearSearch(selected.lst, Input) is int result && result != -1)
+            statusMsg.Text = $"Searching for {Input} with Linear Search: ";
+            if (Algorithms.LinearSearch(untaggedList, Input) is int result && result != -1)
             {
                 lstUntagged.SelectedIndex = result;
                 statusMsg.Text += $"Found in untagged plates at index {result}";
@@ -231,7 +240,7 @@ namespace LicencePlateManagement
         }
 
         /// <summary>
-        /// 
+        /// Puts the selected licence plate into the textbox
         /// </summary>
         private void SelectedIndexChanged(object sender, EventArgs e)
         {
@@ -289,15 +298,8 @@ namespace LicencePlateManagement
         }
         #region File Management
         private string FileName
-            => $"day_{_fileNo:d2}.txt";
-
-        private int FileNo
-        {
-            get => _fileNo;
-            set => _fileNo = value;
-        }
-
-        private int _fileNo = 1;
+            => $"day_{fileNo:d2}.txt";
+        private int fileNo = 1;
 
         /// <summary>
         /// Increments the file number, skipping numbers that already exist.<br/>
@@ -308,13 +310,13 @@ namespace LicencePlateManagement
             var files = Directory.GetFiles(Directory.GetCurrentDirectory()).Select(Path.GetFileName);
 
             while (files.Contains(FileName))
-                FileNo++;
+                fileNo++;
 
-            lblDay.Text = $"day {_fileNo:d2}";
+            lblDay.Text = $"day {fileNo:d2}";
         }
 
         /// <summary>
-        /// 
+        /// Calculates the day number and shows the save dialog box
         /// </summary>
         private void BtnSave_Click(object sender, EventArgs e)
         {
@@ -326,7 +328,7 @@ namespace LicencePlateManagement
         }
 
         /// <summary>
-        /// Spawns an open file dialog
+        /// Shows the open file dialog box
         /// </summary>
         private void BtnOpen_Click(object sender, EventArgs e)
             => dlgOpen.ShowDialog();
