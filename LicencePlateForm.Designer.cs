@@ -309,7 +309,7 @@
             btnSeqSearch.Text = "Linear";
             toolTip1.SetToolTip(btnSeqSearch, "Click to search the list for the plate in the text box\nusing the Linear/Sequential seatch algorithm.");
             btnSeqSearch.UseVisualStyleBackColor = true;
-            btnSeqSearch.Click += BtnSeqSearch_Click;
+            btnSeqSearch.Click += BtnLinSearch_Click;
             // 
             // btnTag
             // 
