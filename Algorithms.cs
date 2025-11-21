@@ -58,9 +58,6 @@ namespace LicencePlateManagement
         /// </summary>
         /// <param name="list"></param>
         /// <param name="addition"></param>
-        public static void AddSorted(List<string> list, string addition)
-        {
-            Algorithms.Merge(list, [addition]);
-        }
+        public static void AddSorted(List<string> list, string addition) => Merge(list, [addition]);
     }
 }
