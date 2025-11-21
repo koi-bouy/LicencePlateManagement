@@ -435,13 +435,11 @@ namespace LicencePlateManagement
 
 
         private void UnselectTagged(object? _, EventArgs __)
-        {
-            lstUntagged.SelectedItem = null;
-        }
+            => lstUntagged.SelectedItem = null;
+
         private void UnselectUntagged(object? _, EventArgs __)
-        {
-            lstTagged.SelectedItem = null;
-        }
+            => lstTagged.SelectedItem = null;
+
 
         /// <summary>
         /// Tells SyncLists which lists to sync
