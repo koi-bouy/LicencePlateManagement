@@ -3,14 +3,15 @@
 // Version: 1.0
 // Name: Active Systems Pty. Library Management System
 // Logic for program that keeps track of West Australian licence plates.
+using System.Diagnostics;
 using System.Text.RegularExpressions;
 
 namespace LicencePlateManagement
 {
     public partial class LicencePlateForm : Form
     {
-        private readonly List<string> untaggedList = [];
-        private readonly List<string> taggedList = [];
+        private readonly List<string> untaggedList = ["1AAA-123", "1CCC-123"];
+        private readonly List<string> taggedList = ["1BBB-123", "1DDD-123"];
 
 
 
@@ -19,29 +20,6 @@ namespace LicencePlateManagement
         public LicencePlateForm()
         {
             InitializeComponent();
-
-            // Set file dialogs to open in the current directory (where the program was executed from) by default
-            dlgOpen.InitialDirectory =
-            dlgSave.InitialDirectory = Environment.CurrentDirectory;
-
-
-            // Initalise selectedList tuple to point to untagged list.
-            selected = (
-                lstUntagged,
-                untaggedList,
-                SyncOption.UNTAGGED
-            );
-
-
-            // Set all buttons to refocus on the the input when clicked
-            void FocusInput(object? _, EventArgs __) => txtInput.Focus();
-            object[] controls = [.. Controls, .. grpSearch.Controls];
-            foreach (Button b in controls.Where(c => c is Button).Cast<Button>())
-            {
-                b.Click += FocusInput;
-            }
-
-            CalculateFileNumber();
         }
 
         /// <summary>
@@ -86,7 +64,7 @@ namespace LicencePlateManagement
 
         private bool ValidatePlate(string plate)
         {
-            string? listName = string.Empty;
+            string? listName = null;
             if (untaggedList.Contains(plate))
                 listName = "untagged";
             if (taggedList.Contains(plate))
@@ -132,21 +110,17 @@ namespace LicencePlateManagement
         private void BtnEdit_Click(object sender, EventArgs e)
         {
             string newPlate = Input.ToUpper();
-            string? oldPlate = (string?)selected.lstBox.SelectedItem;
-            if (ValidatePlate(newPlate))
+            if (selected.lstBox.SelectedItem is not string oldPlate)
             {
-                if (oldPlate == null)
-                {
-                    statusMsg.Text = "No plate selected to edit";
-                }
-                else
-                {
-                    selected.lst[selected.lstBox.SelectedIndex] = newPlate;
-                    statusMsg.Text = $"Edited Plate {oldPlate} to be {newPlate}";
-                    SyncLists(selected.syn);
-                    selected.lstBox.SelectedItem = newPlate;
+                statusMsg.Text = "No plate selected to edit";
+            }
+            else if (ValidatePlate(newPlate))
+            {
+                selected.lst[selected.lstBox.SelectedIndex] = newPlate;
+                statusMsg.Text = $"Edited Plate {oldPlate} to be {newPlate}";
+                SyncLists(selected.syn);
+                selected.lstBox.SelectedItem = newPlate;
 
-                }
             }
         }
 
@@ -199,24 +173,30 @@ namespace LicencePlateManagement
 
         }
 
+        /// <summary>
+        /// Wrapper for accessing the input currently in the textbox.<br/>
+        /// Akw
+        /// </summary>
         String Input
         {
-            get => txtInput.Text.ToUpper();
-            set => txtInput.Text = value.ToUpper();
+            get => txtInput.Text.Trim().ToUpper();
+            set => txtInput.Text = value.Trim().ToUpper();
         }
 
 
         private void BtnBinSearch_Click(object sender, EventArgs e)
         {
             statusMsg.Text = $"Searching for {Input} with Binary Search: ";
-            if (untaggedList.BinarySearch(Input, StringComparer.OrdinalIgnoreCase) is int result && result != -1)
+            int result = untaggedList.BinarySearch(Input, StringComparer.OrdinalIgnoreCase);
+
+            if (result != -1)
             {
                 lstUntagged.SelectedIndex = result;
-                statusMsg.Text += $"Found in untagged plates at index {result}";
+                statusMsg.Text += $"Found at index {result}";
             }
             else
             {
-                statusMsg.Text += "Plate not found";
+                statusMsg.Text += "Plate not found in main untagged list";
                 txtInput.Clear();
             }
         }
@@ -226,15 +206,36 @@ namespace LicencePlateManagement
         /// </summary>
         private void BtnLinSearch_Click(object sender, EventArgs e)
         {
-            statusMsg.Text = $"Searching for {Input} with Linear Search: ";
-            if (Algorithms.LinearSearch(untaggedList, Input) is int result && result != -1)
+            statusMsg.Text = $"Searching for '{Input}' with Linear Search: ";
+            Trace.TraceInformation("Status Strip: " + statusMsg.Text);
+            int result = -1;
+            for (int i = 0; i < untaggedList.Count; i++)
             {
+
+                if (untaggedList[i] == Input)
+                {
+                    Trace.TraceInformation("If condition is true");
+                    result = i;
+                    break;
+                }
+
+                // This trace will only be accessible when the condition is false, as
+                // a true value will break out of the loop.
+                Trace.TraceInformation("If condition is false");
+            }
+            Trace.TraceInformation("result index: " + result);
+            if (result != -1)
+            {
+                Trace.TraceInformation("Plate was found!");
                 lstUntagged.SelectedIndex = result;
-                statusMsg.Text += $"Found in untagged plates at index {result}";
+                statusMsg.Text += $"Found at index {result}";
+                Trace.TraceInformation("Status Strip: " + statusMsg.Text);
             }
             else
             {
-                statusMsg.Text += "Plate not found";
+                Trace.TraceInformation("Plate was not found");
+                statusMsg.Text += "Plate not found in main untagged list";
+                Trace.TraceInformation("Status Strip: " + statusMsg.Text);
                 txtInput.Clear();
             }
         }
@@ -414,18 +415,18 @@ namespace LicencePlateManagement
         {
             try
             {
-                using StreamWriter wr = new(path);
-                foreach (string plate in taggedList)
-                {
-                    wr.WriteLine(plate + ",*");
-                }
-                foreach (string plate in untaggedList)
-                {
-                    wr.WriteLine(plate + ",");
-                }
 
-                statusMsg.Text = $"Saved as file {path}";
-                SetFileLabel(Path.GetFileName(path));
+                List<string> csv = Algorithms.Merge(
+                    taggedList.Select(plate => plate + ",*"),
+                    untaggedList.Select(plate => plate + ",")
+                );
+                using StreamWriter wr = new(path);
+                foreach (string plate in csv)
+                    wr.WriteLine(plate);
+
+                string fileName = Path.GetFileName(path);
+                SetFileLabel(fileName);
+                statusMsg.Text = $"Saved as file {fileName}";
             }
             catch (Exception ex)
             {
@@ -441,6 +442,33 @@ namespace LicencePlateManagement
 
         private void UnselectUntagged(object? _, EventArgs __)
             => lstTagged.SelectedItem = null;
+
+        private void LicencePlateForm_Load(object sender, EventArgs e)
+        {
+            // Set file dialogs to open in the current directory (where the program was executed from) by default
+            dlgOpen.InitialDirectory =
+            dlgSave.InitialDirectory = Environment.CurrentDirectory;
+
+
+            // Initalise selectedList tuple to point to untagged list.
+            selected = (
+                lstUntagged,
+                untaggedList,
+                SyncOption.UNTAGGED
+            );
+
+
+            // Set all buttons to refocus on the the input when clicked
+            void FocusInput(object? _, EventArgs __) => txtInput.Focus();
+            object[] controls = [.. Controls, .. grpSearch.Controls];
+            foreach (Button b in controls.Where(c => c is Button).Cast<Button>())
+            {
+                b.Click += FocusInput;
+            }
+
+            CalculateFileNumber();
+            SyncLists(SyncOption.BOTH);
+        }
 
 
         /// <summary>

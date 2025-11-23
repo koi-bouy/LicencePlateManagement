@@ -3,6 +3,8 @@
 // Version: 1.0
 // Name: Active Systems Pty. Library Management System
 // Class containing Sorting algorithms.
+using Microsoft.VisualBasic;
+
 namespace LicencePlateManagement
 {
     /// <summary>
@@ -51,6 +53,21 @@ namespace LicencePlateManagement
 
             list.Clear();
             list.AddRange(merged);
+        }
+
+        /// <summary>
+        /// Merge sorts two enumerable objects and returns as a list
+        /// </summary>
+        /// <param name="set1">first enumberable to merge</param>
+        /// <param name="set2">second enumerable to merge</param>
+        /// <returns>merged list</returns>
+        public static List<string> Merge(IEnumerable<string> set1, IEnumerable<string> set2)
+        {
+            var output = new List<string>(set1);
+
+            Merge(list: output, additions: [.. set2]);
+
+            return output;
         }
 
         /// <summary>

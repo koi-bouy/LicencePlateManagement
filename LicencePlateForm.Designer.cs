@@ -144,6 +144,7 @@
             lstUntagged.Size = new Size(132, 169);
             lstUntagged.TabIndex = 7;
             toolTip1.SetToolTip(lstUntagged, "Main list.\nClick a plate entry to select, double click to delete.");
+            lstUntagged.Click += UnselectUntagged;
             lstUntagged.SelectedIndexChanged += SelectedIndexChanged;
             lstUntagged.MouseDoubleClick += Delete_DoubleClick;
             // 
@@ -157,6 +158,7 @@
             lstTagged.Size = new Size(132, 169);
             lstTagged.TabIndex = 8;
             toolTip1.SetToolTip(lstTagged, "List of tagged license plates.\nClick a plate to select, double click to untag.");
+            lstTagged.Click += UnselectTagged;
             lstTagged.SelectedIndexChanged += SelectedIndexChanged;
             lstTagged.MouseDoubleClick += Untag;
             // 
@@ -297,9 +299,6 @@
             // 
             // btnSeqSearch
             // 
-
-            lstUntagged.Click += UnselectUntagged;
-            lstTagged.Click += UnselectTagged;
             btnSeqSearch.Cursor = Cursors.Hand;
             btnSeqSearch.Location = new Point(5, 46);
             btnSeqSearch.Margin = new Padding(3, 2, 3, 2);
@@ -365,6 +364,7 @@
             Name = "LicencePlateForm";
             Text = "Active Systems Pty.";
             FormClosed += SaveOnClose;
+            Load += LicencePlateForm_Load;
             ((System.ComponentModel.ISupportInitialize)logo).EndInit();
             statusStrip1.ResumeLayout(false);
             statusStrip1.PerformLayout();
