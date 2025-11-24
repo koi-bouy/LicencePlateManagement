@@ -3,15 +3,14 @@
 // Version: 1.0
 // Name: Active Systems Pty. Library Management System
 // Logic for program that keeps track of West Australian licence plates.
-using System.Diagnostics;
 using System.Text.RegularExpressions;
 
 namespace LicencePlateManagement
 {
     public partial class LicencePlateForm : Form
     {
-        private readonly List<string> untaggedList = ["1AAA-123", "1CCC-123"];
-        private readonly List<string> taggedList = ["1BBB-123", "1DDD-123"];
+        private readonly List<string> untaggedList = [];
+        private readonly List<string> taggedList = [];
 
 
 
@@ -105,8 +104,6 @@ namespace LicencePlateManagement
         /// <summary>
         /// Edits the selected plate, performing the same validation as 
         /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
         private void BtnEdit_Click(object sender, EventArgs e)
         {
             string newPlate = Input.ToUpper();
@@ -123,6 +120,7 @@ namespace LicencePlateManagement
 
             }
         }
+
 
         private void SyncLists(SyncOption category)
         {
@@ -207,35 +205,25 @@ namespace LicencePlateManagement
         private void BtnLinSearch_Click(object sender, EventArgs e)
         {
             statusMsg.Text = $"Searching for '{Input}' with Linear Search: ";
-            Trace.TraceInformation("Status Strip: " + statusMsg.Text);
             int result = -1;
             for (int i = 0; i < untaggedList.Count; i++)
             {
 
                 if (untaggedList[i] == Input)
                 {
-                    Trace.TraceInformation("If condition is true");
                     result = i;
                     break;
                 }
 
-                // This trace will only be accessible when the condition is false, as
-                // a true value will break out of the loop.
-                Trace.TraceInformation("If condition is false");
             }
-            Trace.TraceInformation("result index: " + result);
             if (result != -1)
             {
-                Trace.TraceInformation("Plate was found!");
                 lstUntagged.SelectedIndex = result;
                 statusMsg.Text += $"Found at index {result}";
-                Trace.TraceInformation("Status Strip: " + statusMsg.Text);
             }
             else
             {
-                Trace.TraceInformation("Plate was not found");
                 statusMsg.Text += "Plate not found in main untagged list";
-                Trace.TraceInformation("Status Strip: " + statusMsg.Text);
                 txtInput.Clear();
             }
         }
@@ -467,7 +455,6 @@ namespace LicencePlateManagement
             }
 
             CalculateFileNumber();
-            SyncLists(SyncOption.BOTH);
         }
 
 
