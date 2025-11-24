@@ -10,8 +10,8 @@ namespace LicencePlateManagement
 {
     public partial class LicencePlateForm : Form
     {
-        private readonly List<string> untaggedList = ["1AAA-123", "1CCC-123"];
-        private readonly List<string> taggedList = ["1BBB-123", "1DDD-123"];
+        private readonly List<string> untaggedList = [];
+        private readonly List<string> taggedList = [];
 
 
 
@@ -206,11 +206,15 @@ namespace LicencePlateManagement
         /// </summary>
         private void BtnLinSearch_Click(object sender, EventArgs e)
         {
+            Trace.TraceInformation($"Untagged plates: {{{string.Join(", ", untaggedList)}}}");
+            Trace.TraceInformation($"Search term: \"{Input}\"");
+
             statusMsg.Text = $"Searching for '{Input}' with Linear Search: ";
             Trace.TraceInformation("Status Strip: " + statusMsg.Text);
             int result = -1;
             for (int i = 0; i < untaggedList.Count; i++)
             {
+                Trace.TraceInformation("Current Plate: " + untaggedList[i]);
 
                 if (untaggedList[i] == Input)
                 {
@@ -223,6 +227,7 @@ namespace LicencePlateManagement
                 // a true value will break out of the loop.
                 Trace.TraceInformation("If condition is false");
             }
+
             Trace.TraceInformation("result index: " + result);
             if (result != -1)
             {
@@ -245,6 +250,7 @@ namespace LicencePlateManagement
         /// </summary>
         private void SelectedIndexChanged(object sender, EventArgs e)
         {
+
             var selBox = (ListBox)sender;
             List<string> lst;
             SyncOption syncList;
@@ -467,7 +473,6 @@ namespace LicencePlateManagement
             }
 
             CalculateFileNumber();
-            SyncLists(SyncOption.BOTH);
         }
 
 
