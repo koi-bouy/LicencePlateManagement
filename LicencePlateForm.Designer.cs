@@ -146,7 +146,7 @@
             toolTip1.SetToolTip(lstUntagged, "Main list.\nClick a plate entry to select, double click to delete.");
             lstUntagged.Click += UnselectUntagged;
             lstUntagged.SelectedIndexChanged += SelectedIndexChanged;
-            lstUntagged.MouseDoubleClick += Delete_DoubleClick;
+            lstUntagged.MouseDoubleClick += DeleteSelected;
             // 
             // lstTagged
             // 
@@ -198,7 +198,7 @@
             btnAdd.Name = "btnAdd";
             btnAdd.Size = new Size(82, 22);
             btnAdd.TabIndex = 11;
-            btnAdd.Text = "Add";
+            btnAdd.Text = "Enter";
             toolTip1.SetToolTip(btnAdd, "Click to add the licence plate in the text box to the list.\nThe new plate must be in the format '1[3 letters]-[3 digits]'.");
             btnAdd.UseVisualStyleBackColor = true;
             btnAdd.Click += BtnAdd_Click;
@@ -214,7 +214,7 @@
             btnExit.Text = "Exit";
             toolTip1.SetToolTip(btnExit, "Removes currently selected item from the main untagged list.");
             btnExit.UseVisualStyleBackColor = true;
-            btnExit.Click += BtnExit_Click;
+            btnExit.Click += DeleteSelected;
             // 
             // btnBinSearch
             // 

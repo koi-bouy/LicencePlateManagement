@@ -254,36 +254,33 @@ namespace LicencePlateManagement
             }
         }
 
-        /// <summary>
-        /// Removes the selected plate
-        /// </summary>
-        private void BtnExit_Click(object? sender, EventArgs e)
-        {
-            DeleteSelected();
-        }
 
-        /// <summary>
-        /// Deletes the selected plate on double click
-        /// </summary>
-        private void Delete_DoubleClick(object? sender, MouseEventArgs e)
-        {
-            DeleteSelected();
-        }
 
         /// <summary>
         /// Deletes the selected plate
         /// </summary>
-        private void DeleteSelected()
+        private void DeleteSelected(object sender, EventArgs e)
         {
             int selndx = selected.lstBox.SelectedIndex;
             if (selected.lstBox.SelectedItem is string selItem)
             {
-                selected.lst.RemoveAt(selndx);
-                SyncLists(selected.syn);
-                statusMsg.Text = "Deleted plate: " + selItem;
+                DialogResult accept = MessageBox.Show($"Are you sure you want to delete plate: {selItem}?", "Delete?!", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
+                if (accept == DialogResult.Yes)
+                {
+                    selected.lst.RemoveAt(selndx);
+                    txtInput.Clear();
+                    SyncLists(selected.syn);
+                    statusMsg.Text = "Deleted plate: " + selItem;
+                }
+                else
+                    statusMsg.Text = "Deleting cancelled";
+
+
             }
             else
                 statusMsg.Text = "Nothing selected to delete.";
+
+
         }
         #region File Management
         private string FileName
